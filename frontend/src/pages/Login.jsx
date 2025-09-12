@@ -12,6 +12,78 @@ const Login = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false)
   const [otpSent, setOtpSent] = useState(false)
 
+  // Emerald Tech Logo Component
+  const EmeraldTechLogo = () => (
+    <svg width="56" height="56" viewBox="0 0 56 56" className="filter drop-shadow-2xl">
+      <defs>
+        {/* Emerald Tech Gradient */}
+        <linearGradient id="emeraldGradientLogin" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#10b981" stopOpacity="1" />
+          <stop offset="100%" stopColor="#3b82f6" stopOpacity="1" />
+        </linearGradient>
+        
+        {/* Glow Effect */}
+        <filter id="emeraldGlowLogin">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      
+      {/* Outer diamond */}
+      <path d="M28,8 L40,20 L28,48 L16,20 Z" 
+        stroke="url(#emeraldGradientLogin)" 
+        strokeWidth="2" 
+        fill="none" 
+        opacity="0.9"
+        filter="url(#emeraldGlowLogin)"
+        transform="scale(1.05)"
+        transformOrigin="28 28" />
+      
+      {/* Inner diamond fill */}
+      <path d="M28,12 L36,20 L28,40 L20,20 Z" 
+        fill="url(#emeraldGradientLogin)" 
+        opacity="0.3"
+        transform="scale(1.05)"
+        transformOrigin="28 28" />
+      
+      {/* Center section */}
+      <path d="M20,20 L36,20 L32,28 L24,28 Z" 
+        fill="url(#emeraldGradientLogin)" 
+        opacity="0.7"
+        transform="scale(1.05)"
+        transformOrigin="28 28" />
+      
+      {/* Gaming controller in center */}
+      <g transform="translate(28, 24) scale(1.05)">
+        <rect x="-6" y="-2" width="12" height="4" rx="2" 
+          fill="#fff" 
+          opacity="0.9"/>
+        <rect x="-4" y="-0.5" width="2" height="1" 
+          fill="#10b981"/>
+        <rect x="2" y="-0.5" width="2" height="1" 
+          fill="#3b82f6"/>
+        <circle cx="-3" cy="0" r="0.5" fill="#10b981" opacity="0.8"/>
+        <circle cx="3" cy="0" r="0.5" fill="#3b82f6" opacity="0.8"/>
+      </g>
+      
+      {/* Sparkle effects */}
+      <circle cx="28" cy="20" r="1" fill="#fff" opacity="0.8" transform="scale(1.05)" transformOrigin="28 28" />
+      <circle cx="20" cy="20" r="0.8" fill="#10b981" opacity="0.6" transform="scale(1.05)" transformOrigin="28 28" />
+      <circle cx="36" cy="20" r="0.8" fill="#3b82f6" opacity="0.6" transform="scale(1.05)" transformOrigin="28 28" />
+      
+      {/* Tech lines */}
+      <path d="M28,12 L28,8 M20,20 L16,20 M36,20 L40,20" 
+        stroke="url(#emeraldGradientLogin)" 
+        strokeWidth="1" 
+        opacity="0.8"
+        transform="scale(1.05)"
+        transformOrigin="28 28" />
+    </svg>
+  )
+
   // Login form state
   const [loginData, setLoginData] = useState({
     emailOrMobile: '',
@@ -24,8 +96,7 @@ const Login = () => {
     email: '',
     mobile: '',
     password: '',
-    confirmPassword: '',
-    referedBy: ''
+    confirmPassword: ''
   })
 
   // Forgot password state
@@ -169,13 +240,19 @@ const Login = () => {
       {/* Header with Logo */}
       <div className={`${isLogin && !showForgotPassword ? 'pt-12 pb-6' : 'pt-16 pb-8'} px-6 text-center relative z-10`}>
         <div className="mb-6">
-          <div className="flex items-center justify-center space-x-3 mb-3">
-            <div className="bg-gradient-to-r from-cyan-400 to-blue-500 p-2 rounded-lg">
-              <span className="text-white font-black text-xl">JX</span>
+          <div className="flex items-center justify-center space-x-0.5 mb-3">
+            <div className="relative">
+              <EmeraldTechLogo />
             </div>
-            <div className="flex flex-col">
-              <span className="text-white font-bold text-2xl leading-tight">JAINX</span>
-              <span className="text-cyan-300 font-medium text-sm tracking-widest">COMPUTERS</span>
+            <div className="flex flex-col items-start">
+              <div className="flex items-center">
+                <span className="text-3xl font-black text-white tracking-tight">GC</span>
+                <span className="text-3xl font-black text-white ml-1 tracking-tight">HUB</span>
+                <span className="text-lg font-medium text-gray-300 ml-1 -mb-1">.in</span>
+              </div>
+              <span className="text-[10px] text-gray-400 font-medium tracking-widest uppercase -mt-1">
+                Gamers & Creators
+              </span>
             </div>
           </div>
           <p className="text-white text-opacity-80 text-base font-medium">
@@ -317,15 +394,14 @@ const Login = () => {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Mobile Number
+                    Mobile Number (Optional)
                   </label>
                   <input
                     type="tel"
                     value={signupData.mobile}
                     onChange={(e) => setSignupData({...signupData, mobile: e.target.value})}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all text-gray-800 text-sm placeholder:text-xs"
-                    placeholder="Mobile number"
-                    required
+                    placeholder="Mobile number (optional)"
                   />
                 </div>
 
@@ -357,18 +433,6 @@ const Login = () => {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1">
-                    Referral Code (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={signupData.referedBy}
-                    onChange={(e) => setSignupData({...signupData, referedBy: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all text-gray-800 text-sm placeholder:text-xs"
-                    placeholder="Referral code"
-                  />
-                </div>
 
                 {errors.signup && (
                   <div className="text-red-500 text-sm font-medium bg-red-50 px-4 py-2 rounded-xl">{errors.signup}</div>

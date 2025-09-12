@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react'
+import axios from 'axios'
+import { AppContext } from './AppContext'
 
 const CartContext = createContext()
 
@@ -57,7 +59,26 @@ const cartReducer = (state, action) => {
     case 'LOAD_CART':
       return {
         ...state,
-        items: action.payload
+        items: action.payload || []
+      }
+
+    case 'SET_LOADING':
+      return {
+        ...state,
+        loading: action.payload
+      }
+
+    case 'SET_ERROR':
+      return {
+        ...state,
+        error: action.payload,
+        loading: false
+      }
+
+    case 'CLEAR_ERROR':
+      return {
+        ...state,
+        error: null
       }
 
     default:
@@ -66,44 +87,220 @@ const cartReducer = (state, action) => {
 }
 
 const initialState = {
-  items: []
+  items: [],
+  loading: false,
+  error: null
 }
 
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState)
+  const { user, isAuthenticated, BACKEND_URL } = useContext(AppContext)
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage or backend on mount/auth change
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart')
-    if (savedCart) {
-      dispatch({ type: 'LOAD_CART', payload: JSON.parse(savedCart) })
+    const loadCart = async () => {
+      // console.log('Loading cart. Auth status:', isAuthenticated, 'User:', user)
+      
+      if (isAuthenticated && user) {
+        // User is logged in - fetch from backend
+        try {
+          dispatch({ type: 'SET_LOADING', payload: true })
+          const response = await axios.get(`${BACKEND_URL}/api/cart`, {
+            withCredentials: true
+          })
+          
+          if (response.data.success) {
+            // Transform backend cart format to frontend format
+            const cartItems = response.data.cart.map(item => ({
+              ...item.product,
+              quantity: item.quantity,
+              addedAt: item.addedAt
+            }))
+            dispatch({ type: 'LOAD_CART', payload: cartItems })
+          }
+        } catch (error) {
+          console.error('Failed to load cart from backend:', error)
+          dispatch({ type: 'SET_ERROR', payload: 'Failed to load cart' })
+        } finally {
+          dispatch({ type: 'SET_LOADING', payload: false })
+        }
+      } else if (isAuthenticated === false) {
+        // User is not logged in - load from localStorage
+        const savedCart = localStorage.getItem('cart')
+        if (savedCart) {
+          const parsedCart = JSON.parse(savedCart)
+          dispatch({ type: 'LOAD_CART', payload: parsedCart })
+        }
+      }
     }
-  }, [])
 
-  // Save cart to localStorage whenever it changes
+    loadCart()
+  }, [isAuthenticated, user, BACKEND_URL])
+
+  // Save to localStorage only for guest users
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(state.items))
-  }, [state.items])
+    if (isAuthenticated === false) {
+      localStorage.setItem('cart', JSON.stringify(state.items))
+    }
+  }, [state.items, isAuthenticated])
 
-  const addToCart = (product) => {
+  // Sync localStorage cart with backend when user logs in
+  useEffect(() => {
+    const syncCartOnLogin = async () => {
+      if (isAuthenticated && user && state.items.length === 0) {
+        const savedCart = localStorage.getItem('cart')
+        if (savedCart) {
+          const localCartItems = JSON.parse(savedCart)
+          if (localCartItems.length > 0) {
+            try {
+              const response = await axios.post(`${BACKEND_URL}/api/cart/sync`, {
+                localCart: localCartItems
+              }, {
+                withCredentials: true
+              })
+              
+              if (response.data.success) {
+                const cartItems = response.data.cart.map(item => ({
+                  ...item.product,
+                  quantity: item.quantity,
+                  addedAt: item.addedAt
+                }))
+                dispatch({ type: 'LOAD_CART', payload: cartItems })
+                // Clear localStorage after successful sync
+                localStorage.removeItem('cart')
+              }
+            } catch (error) {
+              console.error('Failed to sync cart:', error)
+            }
+          }
+        }
+      }
+    }
+
+    syncCartOnLogin()
+  }, [isAuthenticated, user, BACKEND_URL])
+
+  const addToCart = async (product) => {
     const productId = product._id || product.id
+    
     if (!productId) {
       console.error('Product missing id field:', product)
       return
     }
-    dispatch({ type: 'ADD_TO_CART', payload: product })
+
+    if (isAuthenticated && user) {
+      // User is logged in - save to backend
+      try {
+        dispatch({ type: 'SET_LOADING', payload: true })
+        const response = await axios.post(`${BACKEND_URL}/api/cart/add`, {
+          productId,
+          quantity: 1
+        }, {
+          withCredentials: true
+        })
+        
+        if (response.data.success) {
+          const cartItems = response.data.cart.map(item => ({
+            ...item.product,
+            quantity: item.quantity,
+            addedAt: item.addedAt
+          }))
+          dispatch({ type: 'LOAD_CART', payload: cartItems })
+        }
+      } catch (error) {
+        console.error('Failed to add to cart:', error)
+        dispatch({ type: 'SET_ERROR', payload: 'Failed to add item to cart' })
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false })
+      }
+    } else {
+      // Guest user - save to localStorage via reducer
+      dispatch({ type: 'ADD_TO_CART', payload: product })
+    }
   }
 
-  const removeFromCart = (productId) => {
-    dispatch({ type: 'REMOVE_FROM_CART', payload: productId })
+  const removeFromCart = async (productId) => {
+    if (isAuthenticated && user) {
+      // User is logged in - remove from backend
+      try {
+        dispatch({ type: 'SET_LOADING', payload: true })
+        const response = await axios.delete(`${BACKEND_URL}/api/cart/remove/${productId}`, {
+          withCredentials: true
+        })
+        
+        if (response.data.success) {
+          const cartItems = response.data.cart.map(item => ({
+            ...item.product,
+            quantity: item.quantity,
+            addedAt: item.addedAt
+          }))
+          dispatch({ type: 'LOAD_CART', payload: cartItems })
+        }
+      } catch (error) {
+        console.error('Failed to remove from cart:', error)
+        dispatch({ type: 'SET_ERROR', payload: 'Failed to remove item from cart' })
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false })
+      }
+    } else {
+      // Guest user - remove via reducer
+      dispatch({ type: 'REMOVE_FROM_CART', payload: productId })
+    }
   }
 
-  const updateQuantity = (productId, quantity) => {
-    dispatch({ type: 'UPDATE_QUANTITY', payload: { id: productId, quantity } })
+  const updateQuantity = async (productId, quantity) => {
+    if (isAuthenticated && user) {
+      // User is logged in - update in backend
+      try {
+        dispatch({ type: 'SET_LOADING', payload: true })
+        const response = await axios.put(`${BACKEND_URL}/api/cart/update/${productId}`, {
+          quantity
+        }, {
+          withCredentials: true
+        })
+        
+        if (response.data.success) {
+          const cartItems = response.data.cart.map(item => ({
+            ...item.product,
+            quantity: item.quantity,
+            addedAt: item.addedAt
+          }))
+          dispatch({ type: 'LOAD_CART', payload: cartItems })
+        }
+      } catch (error) {
+        console.error('Failed to update cart quantity:', error)
+        dispatch({ type: 'SET_ERROR', payload: 'Failed to update quantity' })
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false })
+      }
+    } else {
+      // Guest user - update via reducer
+      dispatch({ type: 'UPDATE_QUANTITY', payload: { id: productId, quantity } })
+    }
   }
 
-  const clearCart = () => {
-    dispatch({ type: 'CLEAR_CART' })
+  const clearCart = async () => {
+    if (isAuthenticated && user) {
+      // User is logged in - clear from backend
+      try {
+        dispatch({ type: 'SET_LOADING', payload: true })
+        const response = await axios.delete(`${BACKEND_URL}/api/cart/clear`, {
+          withCredentials: true
+        })
+        
+        if (response.data.success) {
+          dispatch({ type: 'CLEAR_CART' })
+        }
+      } catch (error) {
+        console.error('Failed to clear cart:', error)
+        dispatch({ type: 'SET_ERROR', payload: 'Failed to clear cart' })
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false })
+      }
+    } else {
+      // Guest user - clear via reducer
+      dispatch({ type: 'CLEAR_CART' })
+    }
   }
 
   const getTotalPrice = () => {
@@ -116,6 +313,8 @@ export const CartProvider = ({ children }) => {
 
   const value = {
     items: state.items,
+    loading: state.loading,
+    error: state.error,
     addToCart,
     removeFromCart,
     updateQuantity,

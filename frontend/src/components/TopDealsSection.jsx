@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { toast } from 'react-toastify'
+import OrderModal from './OrderModal'
 
 const TopDealsSection = () => {
   const [dealProducts, setDealProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [orderModalOpen, setOrderModalOpen] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState(null)
   const navigate = useNavigate()
   const { addToCart } = useCart()
 
@@ -150,6 +153,17 @@ const TopDealsSection = () => {
     }
   }
 
+  const handleOrderNow = (product, e) => {
+    e.stopPropagation(); // Prevent navigation when clicking order now
+    setSelectedProduct(product)
+    setOrderModalOpen(true)
+  }
+
+  const closeOrderModal = () => {
+    setOrderModalOpen(false)
+    setSelectedProduct(null)
+  }
+
   if (loading) {
     return (
       <section className="py-12 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
@@ -270,42 +284,51 @@ const TopDealsSection = () => {
                     </div>
                   </div>
 
-                  {/* Add to Cart Button */}
-                  <button
-                    onClick={(e) => handleAddToCart(product, e)}
-                    disabled={product.stockQuantity === 0}
-                    className={`w-full py-2 px-3 rounded-lg font-medium text-xs sm:text-sm transition-colors mb-3 ${
-                      product.stockQuantity > 0
-                        ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white cursor-pointer'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    {product.stockQuantity > 0 ? (
-                      <div className="flex items-center justify-center space-x-1">
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m2.6 8L8 13m0 0L5.6 5M8 13v6a2 2 0 002 2h8a2 2 0 002-2v-6M8 13H6m6 8a2 2 0 100-4 2 2 0 000 4zm6 0a2 2 0 100-4 2 2 0 000 4z" />
-                        </svg>
-                        <span>Add to Cart</span>
-                      </div>
-                    ) : (
-                      'Out of Stock'
+                  {/* Action Buttons */}
+                  <div className="space-y-2 mb-3">
+                    <button
+                      onClick={(e) => handleOrderNow(product, e)}
+                      disabled={product.stockQuantity === 0}
+                      className={`w-full py-2 px-3 rounded-lg font-medium text-xs sm:text-sm transition-colors ${
+                        product.stockQuantity > 0
+                          ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white cursor-pointer'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {product.stockQuantity > 0 ? 'Order Now' : 'Out of Stock'}
+                    </button>
+                    
+                    {product.stockQuantity > 0 && (
+                      <button
+                        onClick={(e) => handleAddToCart(product, e)}
+                        className="w-full py-2 px-3 rounded-lg font-medium text-xs sm:text-sm transition-colors bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white cursor-pointer"
+                      >
+                        <div className="flex items-center justify-center space-x-1">
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m2.6 8L8 13m0 0L5.6 5M8 13v6a2 2 0 002 2h8a2 2 0 002-2v-6M8 13H6m6 8a2 2 0 100-4 2 2 0 000 4zm6 0a2 2 0 100-4 2 2 0 000 4z" />
+                          </svg>
+                          <span>Add to Cart</span>
+                        </div>
+                      </button>
                     )}
-                  </button>
+                  </div>
 
                   {/* Stock Status */}
-                  <div className="flex items-center justify-center">
-                    {product.stockQuantity > 0 ? (
-                      <span className="inline-flex items-center px-1.5 py-0.5 sm:px-2 sm:py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
-                        <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></div>
-                        <span className="hidden sm:inline">In Stock</span>
-                        <span className="sm:hidden">Stock</span>
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-1.5 py-0.5 sm:px-2 sm:py-1 bg-red-100 text-red-800 text-xs rounded-full font-medium">
-                        <div className="w-1.5 h-1.5 bg-red-400 rounded-full mr-1"></div>
-                        <span className="text-[10px] sm:text-xs">Out of Stock</span>
-                      </span>
-                    )}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      {product.stockQuantity > 0 ? (
+                        <span className="inline-flex items-center px-1.5 py-0.5 sm:px-2 sm:py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
+                          <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></div>
+                          <span className="hidden sm:inline">In Stock</span>
+                          <span className="sm:hidden">Stock</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-1.5 py-0.5 sm:px-2 sm:py-1 bg-red-100 text-red-800 text-xs rounded-full font-medium">
+                          <div className="w-1.5 h-1.5 bg-red-400 rounded-full mr-1"></div>
+                          <span className="text-[10px] sm:text-xs">Out of Stock</span>
+                        </span>
+                      )}
+                    </div>
                     
                     {/* Savings Amount */}
                     {product.originalPrice && product.originalPrice > product.price && (
@@ -337,6 +360,13 @@ const TopDealsSection = () => {
           </div>
         )}
       </div>
+
+      {/* Order Modal */}
+      <OrderModal 
+        isOpen={orderModalOpen}
+        onClose={closeOrderModal}
+        product={selectedProduct}
+      />
     </section>
   )
 }

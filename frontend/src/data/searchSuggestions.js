@@ -2,13 +2,14 @@
 export const searchSuggestions = [
   // Graphics Cards - Popular models and brands
   'Graphics Card',
+  'Graphics Card 8gb',
   'Graphics Cards',
   'NVIDIA RTX 4090',
   'NVIDIA RTX 4080',
   'NVIDIA RTX 4070 Ti',
   'NVIDIA RTX 4070',
   'NVIDIA RTX 4060 Ti',
-  'NVIDIA RTX 4060',
+  'NVIDIA RTX 4060 graphic card',
   'NVIDIA RTX 3080',
   'NVIDIA RTX 3070',
   'NVIDIA RTX 3060',
@@ -30,6 +31,7 @@ export const searchSuggestions = [
   'Graphics Card Under 20000',
   
   // Laptops - Comprehensive categories and price ranges
+  'Best gaming laptop',
   'Gaming Laptop',
   'Gaming Laptops',
   'Laptop',
@@ -68,6 +70,7 @@ export const searchSuggestions = [
   'ROG Laptop',
   'Pavilion Laptop',
   'Inspiron Laptop',
+  'rtx 4060 laptop',
   
   // Processors - Intel and AMD popular models
   'Processor',

@@ -32,11 +32,13 @@ export const AdminProvider = ({ children }) => {
   };
 
   const userAPI = {
-    getAll: () => api.get('/api/users'),
-    getById: (id) => api.get(`/api/users/${id}`),
-    create: (data) => api.post('/api/users', data),
-    update: (id, data) => api.put(`/api/users/${id}`, data),
-    delete: (id) => api.delete(`/api/users/${id}`),
+    getAll: (params = {}) => api.get('/api/admin/users', { params }),
+    getById: (id) => api.get(`/api/admin/users/${id}`),
+    getStats: () => api.get('/api/admin/users/stats'),
+    update: (id, data) => api.put(`/api/admin/users/${id}`, data),
+    delete: (id) => api.delete(`/api/admin/users/${id}`),
+    resetPassword: (id, data) => api.post(`/api/admin/users/${id}/reset-password`, data),
+    toggleStatus: (id) => api.patch(`/api/admin/users/${id}/toggle-status`),
   };
 
   const orderAPI = {

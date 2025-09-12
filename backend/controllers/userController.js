@@ -683,6 +683,74 @@ const removeFromWishlist = async (req, res) => {
   }
 };
 
+// @desc    Get all users (Admin only)
+// @route   GET /api/users
+// @access  Admin
+const getAllUsers = async (req, res) => {
+  try {
+    const { 
+      page = 1, 
+      limit = 20, 
+      search = '', 
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      role = '',
+      status = ''
+    } = req.query;
+
+    // Build query
+    const query = {};
+
+    // Search by name or email
+    if (search) {
+      query.$or = [
+        { fullName: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Filter by role
+    if (role) {
+      query.role = role;
+    }
+
+    // Filter by status
+    if (status) {
+      query.isActive = status === 'active';
+    }
+
+    const sortDirection = sortOrder === 'asc' ? 1 : -1;
+    const sortOptions = { [sortBy]: sortDirection };
+
+    // Get users with populated orders count
+    const users = await User.find(query)
+      .select('-password -resetOtp -otpExpiresAt')
+      .sort(sortOptions)
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const total = await User.countDocuments(query);
+
+    res.json({
+      success: true,
+      data: users,
+      pagination: {
+        current: page,
+        pages: Math.ceil(total / limit),
+        total
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch users',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -697,5 +765,6 @@ module.exports = {
   removeFromCart,
   clearCart,
   addToWishlist,
-  removeFromWishlist
+  removeFromWishlist,
+  getAllUsers
 };

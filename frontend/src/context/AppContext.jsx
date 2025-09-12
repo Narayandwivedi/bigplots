@@ -15,41 +15,41 @@ export const AppContextProvider = (props) => {
   const [loading, setLoading] = useState(true)
   const [isCheckingAuth, setIsCheckingAuth] = useState(false)
 
-//   // Memoize functions to prevent re-renders
-//   const checkAuthStatus = useCallback(async () => {
-//     // Prevent multiple simultaneous auth checks
-//     if (isCheckingAuth) return
-    
-//     try {
-//       setIsCheckingAuth(true)
-//       setLoading(true)
-//       const response = await axios.get(`${BACKEND_URL}/api/auth/status`, {
-//         withCredentials: true
-//       })
-      
-//       if (response.data.isLoggedIn) {
-//         setIsAuthenticated(true)
-//         setUser(response.data.user)
-//       } else {
-//         setIsAuthenticated(false)
-//         setUser(null)
-//       }
-//     } catch (error) {
-//       setIsAuthenticated(false)
-//       setUser(null)
-//     } finally {
-//       setLoading(false)
-//       setIsCheckingAuth(false)
-//     }
-//   }, [])
+  // Memoize functions to prevent re-renders
+  const checkAuthStatus = useCallback(async () => {
+    // Prevent multiple simultaneous auth checks
+    if (isCheckingAuth) return
+   
+    try {
+      setIsCheckingAuth(true)
+      setLoading(true)
+      const response = await axios.get(`${BACKEND_URL}/api/auth/me`, {
+        withCredentials: true
+      })
+     
+      if (response.data.isLoggedIn) {
+        setIsAuthenticated(true)
+        setUser(response.data.user)
+      } else {
+        setIsAuthenticated(false)
+        setUser(null)
+      }
+    } catch (error) {
+      setIsAuthenticated(false)
+      setUser(null)
+    } finally {
+      setLoading(false)
+      setIsCheckingAuth(false)
+    }
+  }, [isCheckingAuth])
 
-//   // Check authentication status on app load
-//   useEffect(() => {
-//     // Only check auth if we haven't already checked
-//     if (isAuthenticated === null && !user) {
-//       checkAuthStatus()
-//     }
-//   }, [isAuthenticated, user, checkAuthStatus])
+  // Check authentication status on app load
+  useEffect(() => {
+    // Only check auth if we haven't already checked
+    if (isAuthenticated === null && !user && !isCheckingAuth) {
+      checkAuthStatus()
+    }
+  }, [isAuthenticated, user, checkAuthStatus, isCheckingAuth])
 
   // Login function
   const login = useCallback(async (loginData) => {
@@ -76,15 +76,94 @@ export const AppContextProvider = (props) => {
     }
   }, [])
 
+  // Signup function
+  const signup = useCallback(async (signupData) => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/auth/signup`, signupData, {
+        withCredentials: true
+      })
+      
+      if (response.data.success) {
+        setIsAuthenticated(true)
+        setUser(response.data.userData)
+        return { success: true }
+      } else {
+        return { 
+          success: false, 
+          error: response.data.message || 'Signup failed' 
+        }
+      }
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 'Signup failed' 
+      }
+    }
+  }, [])
 
+  // Logout function
+  const logout = useCallback(async () => {
+    try {
+      await axios.post(`${BACKEND_URL}/api/auth/logout`, {}, {
+        withCredentials: true
+      })
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      setIsAuthenticated(false)
+      setUser(null)
+      navigate('/login')
+    }
+  }, [navigate])
 
-
+  // Google login function
+  const googleLogin = useCallback(async (credential) => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/auth/google`, {
+        credential
+      }, {
+        withCredentials: true
+      })
+      
+      if (response.data.success) {
+        setIsAuthenticated(true)
+        setUser(response.data.userData)
+        return { success: true }
+      } else {
+        return { 
+          success: false, 
+          error: response.data.message || 'Google login failed' 
+        }
+      }
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error.response?.data?.message || 'Google login failed' 
+      }
+    }
+  }, [])
 
   // Memoize context value to prevent unnecessary re-renders
   const value = useMemo(() => ({
     BACKEND_URL,
-    
-  }),);
+    user,
+    isAuthenticated,
+    loading,
+    login,
+    signup,
+    logout,
+    googleLogin,
+    checkAuthStatus
+  }), [
+    user,
+    isAuthenticated,
+    loading,
+    login,
+    signup,
+    logout,
+    googleLogin,
+    checkAuthStatus
+  ])
 
   return (
     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>

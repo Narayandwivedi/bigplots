@@ -1,9 +1,21 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useContext } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { AppContext } from '../context/AppContext'
+import { toast } from 'react-toastify'
 
 const Cart = () => {
-  const { items, removeFromCart, updateQuantity, clearCart, getTotalPrice, getTotalItems } = useCart()
+  const { items, loading, error, removeFromCart, updateQuantity, clearCart, getTotalPrice, getTotalItems } = useCart()
+  const { isAuthenticated, user } = useContext(AppContext)
+  const navigate = useNavigate()
+
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      navigate('/login')
+      return
+    }
+    navigate('/checkout')
+  }
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', {
@@ -108,7 +120,7 @@ const Cart = () => {
                               <div className="flex">
                                 <button
                                   onClick={() => removeFromCart(itemId)}
-                                  className="font-medium text-red-600 hover:text-red-500 transition-colors"
+                                  className="font-medium text-red-600 hover:text-red-500 transition-colors cursor-pointer"
                                 >
                                   Remove
                                 </button>
@@ -163,8 +175,11 @@ const Cart = () => {
                 </div>
               </div>
 
-              <button className="w-full mt-6 bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200">
-                Proceed to Checkout
+              <button 
+                onClick={handleCheckout}
+                className="w-full mt-6 bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 cursor-pointer"
+              >
+                {!isAuthenticated ? 'Login to Checkout' : 'Proceed to Checkout'}
               </button>
 
               <p className="text-xs text-gray-500 text-center mt-4">
@@ -173,6 +188,7 @@ const Cart = () => {
             </div>
           </div>
         </div>
+        
       </div>
     </div>
   )

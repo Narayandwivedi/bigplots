@@ -3,17 +3,11 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   // Basic Information
-  firstName: {
+  fullName: {
     type: String,
-    required: [true, 'First name is required'],
+    required: [true, 'full name is required'],
     trim: true,
-    maxlength: [50, 'First name cannot be more than 50 characters']
-  },
-  lastName: {
-    type: String,
-    required: [true, 'Last name is required'],
-    trim: true,
-    maxlength: [50, 'Last name cannot be more than 50 characters']
+    maxlength: [50, 'name cannot be more than 50 characters']
   },
   email: {
     type: String,
@@ -28,7 +22,9 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
+    required: function() {
+      return !this.googleId && !this.facebookId && !this.oauthProvider;
+    },
     minlength: [6, 'Password must be at least 6 characters'],
     select: false // Don't include password in queries by default
   },
@@ -45,10 +41,21 @@ const userSchema = new mongoose.Schema({
     enum: ['male', 'female', 'other', 'prefer-not-to-say'],
   },
 
-  // Profile Image
-  avatar: {
+  // OAuth Information
+  googleId: {
     type: String,
-    default: ''
+    sparse: true // Allow multiple null values but unique non-null values
+  },
+  facebookId: {
+    type: String,
+    sparse: true
+  },
+  oauthProvider: {
+    type: String,
+    enum: ['google', 'facebook', 'apple', 'github']
+  },
+  profilePicture: {
+    type: String // URL to profile picture from OAuth provider
   },
 
   // Address Information
@@ -121,23 +128,12 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+
   role: {
     type: String,
     enum: ['user', 'admin', 'moderator'],
     default: 'user'
   },
-
-  // E-commerce Specific
-  wishlist: [{
-    product: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product'
-    },
-    addedAt: {
-      type: Date,
-      default: Date.now
-    }
-  }],
 
   cart: [{
     product: {
@@ -163,89 +159,27 @@ const userSchema = new mongoose.Schema({
     ref: 'Order'
   }],
 
-  // Preferences
-  preferences: {
-    newsletter: {
-      type: Boolean,
-      default: true
-    },
-    smsNotifications: {
-      type: Boolean,
-      default: true
-    },
-    emailNotifications: {
-      type: Boolean,
-      default: true
-    },
-    currency: {
-      type: String,
-      default: 'INR'
-    },
-    language: {
-      type: String,
-      default: 'en'
-    }
-  },
-
-  // Security
-  emailVerificationToken: String,
-  emailVerificationExpire: Date,
-  passwordResetToken: String,
-  passwordResetExpire: Date,
-  loginAttempts: {
-    type: Number,
-    default: 0
-  },
-  lockUntil: Date,
-
-  // Tracking
-  lastLogin: Date,
-  registrationSource: {
-    type: String,
-    enum: ['website', 'mobile-app', 'social-google', 'social-facebook'],
-    default: 'website'
-  },
-
+ 
   // Analytics
   totalOrders: {
     type: Number,
     default: 0
   },
-  totalSpent: {
-    type: Number,
-    default: 0
-  },
-  loyaltyPoints: {
-    type: Number,
-    default: 0
-  }
 }, {
   timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
 });
 
 // Indexes for better performance
 userSchema.index({ email: 1 });
 userSchema.index({ phone: 1 });
-userSchema.index({ role: 1 });
-userSchema.index({ isActive: 1 });
-userSchema.index({ createdAt: -1 });
 
-// Virtual for full name
-userSchema.virtual('fullName').get(function() {
-  return `${this.firstName} ${this.lastName}`;
-});
 
-// Virtual for account lock status
-userSchema.virtual('isLocked').get(function() {
-  return !!(this.lockUntil && this.lockUntil > Date.now());
-});
+
 
 // Pre-save middleware to hash password
 userSchema.pre('save', async function(next) {
-  // Only hash password if it's modified
-  if (!this.isModified('password')) return next();
+  // Only hash password if it's modified and exists
+  if (!this.isModified('password') || !this.password) return next();
 
   try {
     // Hash password with cost of 12
@@ -266,32 +200,7 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
   }
 };
 
-// Method to increment login attempts
-userSchema.methods.incLoginAttempts = function() {
-  // If we have a previous lock that has expired, restart at 1
-  if (this.lockUntil && this.lockUntil < Date.now()) {
-    return this.updateOne({
-      $unset: { lockUntil: 1 },
-      $set: { loginAttempts: 1 }
-    });
-  }
-  
-  const updates = { $inc: { loginAttempts: 1 } };
-  
-  // Lock account after 5 failed attempts for 2 hours
-  if (this.loginAttempts + 1 >= 5 && !this.isLocked) {
-    updates.$set = { lockUntil: Date.now() + 2 * 60 * 60 * 1000 }; // 2 hours
-  }
-  
-  return this.updateOne(updates);
-};
 
-// Method to reset login attempts
-userSchema.methods.resetLoginAttempts = function() {
-  return this.updateOne({
-    $unset: { loginAttempts: 1, lockUntil: 1 }
-  });
-};
 
 // Method to add item to cart
 userSchema.methods.addToCart = function(productId, quantity = 1) {

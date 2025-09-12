@@ -14,7 +14,8 @@ const {
   removeFromCart,
   clearCart,
   addToWishlist,
-  removeFromWishlist
+  removeFromWishlist,
+  getAllUsers
 } = require('../controllers/userController');
 
 const { protect, authorize, loginLimiter, checkResourceOwnership } = require('../middleware/auth');
@@ -56,5 +57,8 @@ router.route('/wishlist')
 
 router.route('/wishlist/:productId')
   .delete(removeFromWishlist);
+
+// Admin routes (no auth middleware as requested)
+router.get('/admin/all', getAllUsers); // GET /api/users/admin/all - Get all users (admin)
 
 module.exports = router;

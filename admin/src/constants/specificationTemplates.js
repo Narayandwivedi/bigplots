@@ -61,7 +61,7 @@ export const SPECIFICATION_TEMPLATES = {
   'motherboards': [
     { key: 'Socket', label: 'Socket', required: true, placeholder: 'e.g., LGA1700' },
     { key: 'Chipset', label: 'Chipset', required: true, placeholder: 'e.g., Z790' },
-    { key: 'Form Factor', label: 'Form Factor', required: true, placeholder: 'e.g., ATX' },
+    { key: 'Form Factor', label: 'Form Factor', required: false, placeholder: 'e.g., ATX' },
     { key: 'Memory Support', label: 'Memory Support', required: false, placeholder: 'e.g., DDR5-5600' },
     { key: 'Memory Slots', label: 'Memory Slots', required: false, placeholder: 'e.g., 4x DIMM' },
     { key: 'Max Memory', label: 'Max Memory', required: false, placeholder: 'e.g., 128GB' },

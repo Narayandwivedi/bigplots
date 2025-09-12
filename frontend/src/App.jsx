@@ -6,6 +6,7 @@ import { AppContextProvider } from './context/AppContext'
 import { CartProvider } from './context/CartContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import MobileBottomNav from './components/MobileBottomNav'
 import Homepage from './pages/Homepage'
 import About from './pages/About'
 import Contact from './pages/Contact'
@@ -29,18 +30,33 @@ import CustomPcBuild from './pages/CustomPcBuild'
 import Laptops from './pages/Laptops'
 import SearchResults from './pages/SearchResults'
 import Cart from './pages/Cart'
+import Checkout from './pages/Checkout'
+import Profile from './pages/Profile'
+import MyOrders from './pages/MyOrders'
+import ManageAddresses from './pages/ManageAddresses'
+import ProfileInfo from './pages/ProfileInfo'
+import CustomerSupport from './pages/CustomerSupport'
+import ProtectedRoute from './components/ProtectedRoute'
+import BlogsPage from './pages/blog/BlogsPage'
+import BlogDetailPage from './pages/blog/BlogDetailPage'
 
 const AppContent = () => {
   const location = useLocation()
   const isLoginPage = location.pathname === '/login'
 
   return (
-    <div>
+    <div className="pb-20 md:pb-0">
       {!isLoginPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+        <Route path="/manage-addresses" element={<ProtectedRoute><ManageAddresses /></ProtectedRoute>} />
+        <Route path="/profile-info" element={<ProtectedRoute><ProfileInfo /></ProtectedRoute>} />
+        <Route path="/customer-support" element={<CustomerSupport />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
@@ -49,6 +65,8 @@ const AppContent = () => {
         <Route path="/pc-parts" element={<Pcparts />} />
         <Route path="/computer-accessories" element={<ComputerAccessories />} />
         <Route path="/laptops" element={<Laptops />} />
+        <Route path="/blog" element={<BlogsPage />} />
+        <Route path="/blog/:slug" element={<BlogDetailPage />} />
         <Route path="/pc-parts/graphics-card" element={<GraphicsCard />} />
         <Route path="/pc-parts/processors" element={<Processor />} />
         <Route path="/pc-parts/memory" element={<Memory />} />
@@ -94,6 +112,7 @@ const AppContent = () => {
         <Route path="/product/:id" element={<ProductDetail />} />
       </Routes>
       {!isLoginPage && <Footer />}
+      {!isLoginPage && <MobileBottomNav />}
       <ToastContainer
         position="top-right"
         autoClose={600}
