@@ -133,7 +133,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="w-full lg:w-[92%] mx-auto px-2 sm:px-4">
+    <section className="w-full lg:w-[92%] mx-auto px-1 sm:px-4">
       <div className="relative overflow-hidden lg:hidden">
         <div
           className={`${isMobileSliding ? 'transition-transform duration-700 ease-in-out' : 'transition-none'} flex`}
@@ -142,7 +142,7 @@ const HeroSection = () => {
           {mobileSlideHeroes.map(({ hero, heroIndex, offset }) => (
             <div
               key={`mobile-hero-${hero._id || heroIndex}-${mobileStartIndex}-${offset}`}
-              className="shrink-0 px-1"
+              className="shrink-0 px-0.5"
               style={{ width: `${MOBILE_CARD_WIDTH_PERCENT}%` }}
             >
               {renderHeroItem(hero, heroIndex, `mobile-${offset}`)}
