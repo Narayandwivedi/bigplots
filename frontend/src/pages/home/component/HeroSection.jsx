@@ -4,9 +4,9 @@ import { AppContext } from '../../../context/AppContext';
 
 const demoHeroes = [
   { _id: 'demo-1', imageUrl: '/banana.png', title: 'Banana Banner', linkUrl: '' },
-  { _id: 'demo-2', imageUrl: '/apple.png', title: 'Apple Banner', linkUrl: '' },
+  { _id: 'demo-2', imageUrl: '/apple.avif', title: 'Apple Banner', linkUrl: '' },
   { _id: 'demo-3', imageUrl: '/onion.png', title: 'Onion Banner', linkUrl: '' },
-  { _id: 'demo-4', imageUrl: '/almond.png', title: 'Almond Banner', linkUrl: '' }
+  { _id: 'demo-4', imageUrl: '/almond.avif', title: 'Almond Banner', linkUrl: '' }
 ];
 
 const resolveHeroImageUrl = (backendUrl, imageUrl) => {
