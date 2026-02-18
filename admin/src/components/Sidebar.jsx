@@ -78,6 +78,15 @@ const Sidebar = ({ isOpen, onClose }) => {
       )
     },
     {
+      name: 'Shop Categories',
+      path: '/shop-category-management',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7l9-4 9 4-9 4-9-4zm0 6l9 4 9-4M3 13v4l9 4 9-4v-4" />
+        </svg>
+      )
+    },
+    {
       name: 'Settings',
       path: '/settings',
       icon: (
