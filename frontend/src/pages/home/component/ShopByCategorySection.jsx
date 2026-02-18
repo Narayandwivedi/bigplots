@@ -230,9 +230,9 @@ const ShopByCategorySection = () => {
                       alt={category.name}
                       className={`${unifiedImageClassName} object-contain object-center drop-shadow-[0_6px_10px_rgba(0,0,0,0.2)]`}
                     />
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-r from-yellow-200 via-amber-300 to-yellow-400 px-0.5 py-[2px] sm:py-0.5 text-center">
+                    <div className="absolute inset-x-1 bottom-1 rounded-md border border-amber-200/80 bg-gradient-to-r from-amber-100/95 via-yellow-100/95 to-amber-200/95 px-1 py-[2px] sm:py-0.5 text-center shadow-[0_2px_8px_rgba(120,53,15,0.22)] backdrop-blur-[1px]">
                       <span
-                        className="inline-block max-w-[97%] truncate whitespace-nowrap text-[10.5px] sm:text-[12px] lg:text-[13px] font-black leading-[1] tracking-[-0.015em] text-amber-900"
+                        className="inline-block max-w-[97%] truncate whitespace-nowrap text-[10px] sm:text-[11.5px] lg:text-[12.5px] font-black uppercase leading-[1] tracking-[0.01em] text-amber-900 drop-shadow-[0_0.5px_0_rgba(255,255,255,0.55)]"
                         style={{ fontFamily: '"Bahnschrift Condensed","Roboto Condensed","Arial Narrow","Helvetica Neue Condensed","Liberation Sans Narrow",sans-serif' }}
                       >
                         {stripLabel}
