@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import { AppContext } from '../context/AppContext';
+import { AppContext } from '../../../context/AppContext';
 
 const demoHeroes = [
   { _id: 'demo-1', imageUrl: '/banana.png', title: 'Banana Banner', linkUrl: '' },
@@ -18,7 +18,7 @@ const resolveHeroImageUrl = (backendUrl, imageUrl) => {
   return imageUrl;
 };
 
-const HeroCarousel = () => {
+const HeroSection = () => {
   const { BACKEND_URL } = useContext(AppContext);
   const [heroes, setHeroes] = useState([]);
 
@@ -94,4 +94,4 @@ const HeroCarousel = () => {
   );
 };
 
-export default HeroCarousel;
+export default HeroSection;

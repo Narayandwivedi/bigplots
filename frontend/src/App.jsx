@@ -7,7 +7,7 @@ import { CartProvider } from './context/CartContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import MobileBottomNav from './components/MobileBottomNav'
-import Homepage from './pages/Homepage'
+import Home from './pages/home/Home'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
@@ -52,7 +52,7 @@ const AppContent = () => {
     <div className="pb-20 md:pb-0">
       {!isLoginPage && !isChatPage && <Navbar />}
       <Routes>
-        <Route path="/" element={<Homepage />} />
+        <Route path="/" element={<Home />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
