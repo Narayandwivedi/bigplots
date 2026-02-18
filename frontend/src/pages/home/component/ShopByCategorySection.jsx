@@ -196,8 +196,8 @@ const ShopByCategorySection = () => {
 
   return (
     <section className="bg-gradient-to-b from-white via-white to-cyan-50/70 pt-2 pb-8 md:py-10">
-      <div className="max-w-[86rem] mx-auto px-1.5 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4 md:gap-5">
+      <div className="max-w-[86rem] mx-auto px-1 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-4 lg:grid-cols-6 gap-1.5 sm:gap-4 md:gap-5">
           {displayCategories.map((category, index) => {
             const Icon = category.icon
             const iconLabel = category.name === 'Properties' ? 'Property' : category.name
@@ -215,7 +215,7 @@ const ShopByCategorySection = () => {
                   <img
                     src={category.image}
                     alt={category.name}
-                    className={`${category.imageClassName || 'w-[100%] h-[100%] sm:w-[90%] sm:h-[90%] lg:w-[76%] lg:h-[76%]'} object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.2)]`}
+                    className={`${category.imageClassName || 'w-[100%] h-[100%] sm:w-[90%] sm:h-[90%] lg:w-[76%] lg:h-[76%]'} scale-[1.04] sm:scale-100 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.2)]`}
                   />
                 ) : (
                   <>
