@@ -21,6 +21,7 @@ const resolveHeroImageUrl = (backendUrl, imageUrl) => {
 const HeroSection = () => {
   const { BACKEND_URL } = useContext(AppContext);
   const [heroes, setHeroes] = useState([]);
+  const [mobileSlideIndex, setMobileSlideIndex] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -52,44 +53,72 @@ const HeroSection = () => {
     return demoHeroes;
   }, [heroes]);
 
+  const mobileChunkSize = 2;
+  const mobileChunkCount = useMemo(() => {
+    return Math.max(1, Math.ceil(displayHeroes.length / mobileChunkSize));
+  }, [displayHeroes.length]);
+
+  useEffect(() => {
+    setMobileSlideIndex(0);
+  }, [mobileChunkCount]);
+
+  useEffect(() => {
+    if (mobileChunkCount <= 1) return undefined;
+
+    const intervalId = setInterval(() => {
+      setMobileSlideIndex((prev) => (prev + 1) % mobileChunkCount);
+    }, 2200);
+
+    return () => clearInterval(intervalId);
+  }, [mobileChunkCount]);
+
+  const mobileHeroes = useMemo(() => {
+    const start = mobileSlideIndex * mobileChunkSize;
+    return displayHeroes.slice(start, start + mobileChunkSize);
+  }, [displayHeroes, mobileSlideIndex]);
+
+  const renderHeroItem = (hero, index, keyPrefix = 'hero') => {
+    const imageSrc = resolveHeroImageUrl(BACKEND_URL, hero.imageUrl);
+    const altText = hero.title || `Hero banner ${index + 1}`;
+    const hasLink = Boolean(hero.linkUrl);
+    const isExternal = /^https?:\/\//i.test(hero.linkUrl || '');
+
+    const imageNode = (
+      <img
+        src={imageSrc}
+        alt={altText}
+        className="w-full h-auto block rounded-md"
+      />
+    );
+
+    if (!hasLink) {
+      return (
+        <div key={`${keyPrefix}-${hero._id || imageSrc}-${index}`}>
+          {imageNode}
+        </div>
+      );
+    }
+
+    return (
+      <a
+        key={`${keyPrefix}-${hero._id || imageSrc}-${index}`}
+        href={hero.linkUrl}
+        target={isExternal ? '_blank' : '_self'}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+      >
+        {imageNode}
+      </a>
+    );
+  };
+
   return (
     <section className="w-full lg:w-[92%] mx-auto px-2 sm:px-4">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 items-center">
-        {displayHeroes.map((hero, index) => {
-          const imageSrc = resolveHeroImageUrl(BACKEND_URL, hero.imageUrl);
-          const altText = hero.title || `Hero banner ${index + 1}`;
-          const hasLink = Boolean(hero.linkUrl);
-          const isExternal = /^https?:\/\//i.test(hero.linkUrl || '');
-          const visibilityClass = index > 1 ? 'hidden lg:block' : 'block';
+      <div className="grid grid-cols-2 gap-2 md:gap-4 items-center lg:hidden">
+        {mobileHeroes.map((hero, index) => renderHeroItem(hero, index + (mobileSlideIndex * mobileChunkSize), 'mobile'))}
+      </div>
 
-          const imageNode = (
-            <img
-              src={imageSrc}
-              alt={altText}
-              className="w-full h-auto block rounded-md"
-            />
-          );
-
-          if (!hasLink) {
-            return (
-              <div key={hero._id || `${imageSrc}-${index}`} className={visibilityClass}>
-                {imageNode}
-              </div>
-            );
-          }
-
-          return (
-            <a
-              key={hero._id || `${imageSrc}-${index}`}
-              href={hero.linkUrl}
-              target={isExternal ? '_blank' : '_self'}
-              rel={isExternal ? 'noopener noreferrer' : undefined}
-              className={visibilityClass}
-            >
-              {imageNode}
-            </a>
-          );
-        })}
+      <div className="hidden lg:grid lg:grid-cols-4 gap-2 md:gap-4 items-center">
+        {displayHeroes.map((hero, index) => renderHeroItem(hero, index, 'desktop'))}
       </div>
     </section>
   );
