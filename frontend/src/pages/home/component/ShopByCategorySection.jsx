@@ -197,7 +197,7 @@ const ShopByCategorySection = () => {
   return (
     <section className="bg-gradient-to-b from-white via-white to-cyan-50/70 pt-2 pb-8 md:py-10">
       <div className="max-w-[86rem] mx-auto px-1.5 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 md:gap-5">
+        <div className="grid grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4 md:gap-5">
           {displayCategories.map((category, index) => {
             const Icon = category.icon
             const iconLabel = category.name === 'Properties' ? 'Property' : category.name
