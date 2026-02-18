@@ -22,6 +22,7 @@ const HeroSection = () => {
   const { BACKEND_URL } = useContext(AppContext);
   const [heroes, setHeroes] = useState([]);
   const [mobileSlideIndex, setMobileSlideIndex] = useState(0);
+  const [isMobileDarkened, setIsMobileDarkened] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -60,16 +61,63 @@ const HeroSection = () => {
 
   useEffect(() => {
     setMobileSlideIndex(0);
+    setIsMobileDarkened(false);
   }, [mobileChunkCount]);
 
   useEffect(() => {
     if (mobileChunkCount <= 1) return undefined;
 
-    const intervalId = setInterval(() => {
-      setMobileSlideIndex((prev) => (prev + 1) % mobileChunkCount);
-    }, 2200);
+    const clearDurationMs = 1500;
+    const fadeToDarkDurationMs = 850;
+    const darkHoldDurationMs = 120;
+    const fadeToClearBufferMs = 700;
+    const timeoutIds = new Set();
+    let isCancelled = false;
 
-    return () => clearInterval(intervalId);
+    const schedule = (fn, delay) => {
+      const timeoutId = setTimeout(() => {
+        timeoutIds.delete(timeoutId);
+        if (!isCancelled) {
+          fn();
+        }
+      }, delay);
+      timeoutIds.add(timeoutId);
+    };
+
+    const runCycle = () => {
+      if (isCancelled) return;
+
+      // Start from a clear/normal frame.
+      setIsMobileDarkened(false);
+
+      schedule(() => {
+        // Slowly dim to dark.
+        setIsMobileDarkened(true);
+
+        schedule(() => {
+          // Switch while frame is dark.
+          setMobileSlideIndex((prev) => (prev + 1) % mobileChunkCount);
+
+          schedule(() => {
+            // Reveal the new frame clearly.
+            setIsMobileDarkened(false);
+
+            // Keep it clear for a while, then repeat.
+            schedule(() => {
+              runCycle();
+            }, clearDurationMs + fadeToClearBufferMs);
+          }, darkHoldDurationMs);
+        }, fadeToDarkDurationMs);
+      }, clearDurationMs);
+    };
+
+    runCycle();
+
+    return () => {
+      isCancelled = true;
+      timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId));
+      timeoutIds.clear();
+    };
   }, [mobileChunkCount]);
 
   const mobileHeroes = useMemo(() => {
@@ -113,8 +161,11 @@ const HeroSection = () => {
 
   return (
     <section className="w-full lg:w-[92%] mx-auto px-2 sm:px-4">
-      <div className="grid grid-cols-2 gap-2 md:gap-4 items-center lg:hidden">
-        {mobileHeroes.map((hero, index) => renderHeroItem(hero, index + (mobileSlideIndex * mobileChunkSize), 'mobile'))}
+      <div className="relative lg:hidden">
+        <div className="grid grid-cols-2 gap-2 md:gap-4 items-center">
+          {mobileHeroes.map((hero, index) => renderHeroItem(hero, index + (mobileSlideIndex * mobileChunkSize), 'mobile'))}
+        </div>
+        <div className={`pointer-events-none absolute inset-0 bg-black transition-opacity duration-[850ms] ease-in-out ${isMobileDarkened ? 'opacity-100' : 'opacity-0'}`} />
       </div>
 
       <div className="hidden lg:grid lg:grid-cols-4 gap-2 md:gap-4 items-center">
