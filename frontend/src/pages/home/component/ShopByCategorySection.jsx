@@ -19,7 +19,7 @@ import {
 import { AppContext } from '../../../context/AppContext'
 
 const demoCategories = [
-  { name: 'Fruits', query: 'fruits', icon: Apple, gradient: 'from-red-500 to-orange-500', image: '/fruit1.avif' },
+  { name: 'Fruits', query: 'fruits', icon: Apple, gradient: 'from-red-500 to-orange-500', image: '/fruits.avif' },
   {
     name: 'Super Fruits',
     query: 'super fruits',
