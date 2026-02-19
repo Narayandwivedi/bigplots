@@ -197,12 +197,22 @@ const ShopByCategorySection = () => {
   return (
     <section className="bg-gradient-to-b from-white via-white to-cyan-50/70 pt-2 pb-2 md:py-10">
       <div className="max-w-[86rem] mx-auto px-1 sm:px-6 lg:px-8">
-        <div className="mb-2 sm:mb-4 flex flex-col items-center">
-          <h2 className="inline-flex items-center gap-2 sm:gap-3 text-center text-[15px] sm:text-[24px] font-bold sm:font-bold text-slate-800 tracking-[0.01em]">
-            <span className="h-[1.5px] w-10 sm:w-20 rounded-full bg-amber-700/65" aria-hidden="true" />
-            <span>Shop by Category</span>
-            <span className="h-[1.5px] w-10 sm:w-20 rounded-full bg-amber-700/65" aria-hidden="true" />
-          </h2>
+        <div className="mb-2 sm:mb-4">
+          <div className="mx-auto grid w-full max-w-xl grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3">
+            <img
+              src="/topdeal.avif"
+              alt="Top Deal"
+              className="relative left-3 sm:left-5 md:left-6 w-28 sm:w-40 md:w-48 h-auto rounded-md object-contain"
+              loading="lazy"
+            />
+            <h2 className="whitespace-nowrap text-center text-[14px] sm:text-[22px] font-bold text-slate-800 tracking-[0.01em]">
+              Shop by Category
+            </h2>
+            <span
+              className="invisible w-28 sm:w-40 md:w-48"
+              aria-hidden="true"
+            />
+          </div>
         </div>
         <div className="grid grid-cols-4 lg:grid-cols-6 gap-1.5 sm:gap-4 md:gap-5">
           {displayCategories.map((category, index) => {
