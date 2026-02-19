@@ -177,25 +177,7 @@ const demoCategories = [
     imageClassName:
       "w-[100%] h-[100%] sm:w-[96%] sm:h-[96%] lg:w-[86%] lg:h-[86%]",
   },
-  {
-    name: "Shopping Voucher",
-    query: "shopping voucher",
-    icon: Package,
-    gradient: "from-cyan-500 to-blue-600",
-    image: "/voucher.avif",
-    imageClassName:
-      "w-[100%] h-[100%] sm:w-[98%] sm:h-[98%] lg:w-[90%] lg:h-[90%]",
-  },
-  {
-    name: "Sweets",
-    query: "sweets",
-    icon: Croissant,
-    gradient: "from-pink-500 to-rose-600",
-    image: "/sweets.avif",
-    imageClassName:
-      "w-[100%] h-[100%] sm:w-[96%] sm:h-[96%] lg:w-[86%] lg:h-[86%]",
-  },
- 
+
 
 ];
 
@@ -247,6 +229,29 @@ const newBikeCategory = {
     "w-[100%] h-[100%] sm:w-[96%] sm:h-[96%] lg:w-[86%] lg:h-[86%]",
 };
 
+const fullBodyCheckupCategory = {
+  _id: "static-full-body-checkup",
+  name: "Full Body Checkup",
+  query: "full body checkup",
+  redirectUrl: "",
+  image: "/fullbody.avif",
+  icon: Package,
+  gradient: "from-emerald-500 to-teal-600",
+  imageClassName:
+    "w-[100%] h-[100%] sm:w-[96%] sm:h-[96%] lg:w-[86%] lg:h-[86%]",
+};
+
+const flatCategory = {
+  _id: "static-flat",
+  name: "Flat",
+  query: "flat",
+  redirectUrl: "",
+  image: "/flat.avif",
+  icon: Building2,
+  gradient: "from-cyan-500 to-blue-600",
+  imageClassName:
+    "w-[100%] h-[100%] sm:w-[96%] sm:h-[96%] lg:w-[86%] lg:h-[86%]",
+};
 const resolveCategoryImageUrl = (backendUrl, imageUrl) => {
   if (!imageUrl) return "";
   if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
@@ -347,6 +352,8 @@ const ShopByCategorySection = () => {
       flightsCategory,
       oldBikeCategory,
       newBikeCategory,
+      fullBodyCheckupCategory,
+      flatCategory,
     ];
 
     return requiredCategories.reduce((updatedCategories, requiredCategory) => {
