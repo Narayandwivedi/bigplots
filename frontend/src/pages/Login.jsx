@@ -12,78 +12,6 @@ const Login = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false)
   const [otpSent, setOtpSent] = useState(false)
 
-  // Emerald Tech Logo Component
-  const EmeraldTechLogo = () => (
-    <svg width="56" height="56" viewBox="0 0 56 56" className="filter drop-shadow-2xl">
-      <defs>
-        {/* Emerald Tech Gradient */}
-        <linearGradient id="emeraldGradientLogin" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#10b981" stopOpacity="1" />
-          <stop offset="100%" stopColor="#3b82f6" stopOpacity="1" />
-        </linearGradient>
-        
-        {/* Glow Effect */}
-        <filter id="emeraldGlowLogin">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-      </defs>
-      
-      {/* Outer diamond */}
-      <path d="M28,8 L40,20 L28,48 L16,20 Z" 
-        stroke="url(#emeraldGradientLogin)" 
-        strokeWidth="2" 
-        fill="none" 
-        opacity="0.9"
-        filter="url(#emeraldGlowLogin)"
-        transform="scale(1.05)"
-        transformOrigin="28 28" />
-      
-      {/* Inner diamond fill */}
-      <path d="M28,12 L36,20 L28,40 L20,20 Z" 
-        fill="url(#emeraldGradientLogin)" 
-        opacity="0.3"
-        transform="scale(1.05)"
-        transformOrigin="28 28" />
-      
-      {/* Center section */}
-      <path d="M20,20 L36,20 L32,28 L24,28 Z" 
-        fill="url(#emeraldGradientLogin)" 
-        opacity="0.7"
-        transform="scale(1.05)"
-        transformOrigin="28 28" />
-      
-      {/* Gaming controller in center */}
-      <g transform="translate(28, 24) scale(1.05)">
-        <rect x="-6" y="-2" width="12" height="4" rx="2" 
-          fill="#fff" 
-          opacity="0.9"/>
-        <rect x="-4" y="-0.5" width="2" height="1" 
-          fill="#10b981"/>
-        <rect x="2" y="-0.5" width="2" height="1" 
-          fill="#3b82f6"/>
-        <circle cx="-3" cy="0" r="0.5" fill="#10b981" opacity="0.8"/>
-        <circle cx="3" cy="0" r="0.5" fill="#3b82f6" opacity="0.8"/>
-      </g>
-      
-      {/* Sparkle effects */}
-      <circle cx="28" cy="20" r="1" fill="#fff" opacity="0.8" transform="scale(1.05)" transformOrigin="28 28" />
-      <circle cx="20" cy="20" r="0.8" fill="#10b981" opacity="0.6" transform="scale(1.05)" transformOrigin="28 28" />
-      <circle cx="36" cy="20" r="0.8" fill="#3b82f6" opacity="0.6" transform="scale(1.05)" transformOrigin="28 28" />
-      
-      {/* Tech lines */}
-      <path d="M28,12 L28,8 M20,20 L16,20 M36,20 L40,20" 
-        stroke="url(#emeraldGradientLogin)" 
-        strokeWidth="1" 
-        opacity="0.8"
-        transform="scale(1.05)"
-        transformOrigin="28 28" />
-    </svg>
-  )
-
   // Login form state
   const [loginData, setLoginData] = useState({
     emailOrMobile: '',
@@ -228,7 +156,7 @@ const Login = () => {
 
   return (
     <>
-      <div className={`bg-gradient-to-br from-gray-900 via-gray-800 to-black ${isLogin && !showForgotPassword ? 'h-screen' : 'min-h-screen'} max-w-md mx-auto relative overflow-hidden`}>
+      <div className={`bg-gradient-to-br from-gray-900 via-gray-800 to-black ${!isLogin && !showForgotPassword ? 'h-screen flex flex-col' : 'min-h-screen'} max-w-md mx-auto relative overflow-hidden`}>
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-16 left-8 w-32 h-32 bg-cyan-300 rounded-full blur-3xl"></div>
@@ -238,23 +166,13 @@ const Login = () => {
       </div>
 
       {/* Header with Logo */}
-      <div className={`${isLogin && !showForgotPassword ? 'pt-12 pb-6' : 'pt-16 pb-8'} px-6 text-center relative z-10`}>
-        <div className="mb-6">
-          <div className="flex items-center justify-center space-x-0.5 mb-3">
-            <div className="relative">
-              <EmeraldTechLogo />
-            </div>
-            <div className="flex flex-col items-start">
-              <div className="flex items-center">
-                <span className="text-3xl font-black text-white tracking-tight">GC</span>
-                <span className="text-3xl font-black text-white ml-1 tracking-tight">HUB</span>
-                <span className="text-lg font-medium text-gray-300 ml-1 -mb-1">.in</span>
-              </div>
-              <span className="text-[10px] text-gray-400 font-medium tracking-widest uppercase -mt-1">
-                Gamers & Creators
-              </span>
-            </div>
-          </div>
+      <div className={`${isLogin && !showForgotPassword ? 'pt-1 pb-4' : 'pt-5 pb-6'} px-6 text-center relative z-10`}>
+        <div className="mb-4">
+          <img
+            src="/abcdmarket%20logo.webp"
+            alt="ABCD Market Logo"
+            className="h-20 w-auto mx-auto object-contain mb-1"
+          />
           <p className="text-white text-opacity-80 text-base font-medium">
             {showForgotPassword ? 'Reset Your Password' : (isLogin ? 'Welcome Back!' : 'Join Us Today')}
           </p>
@@ -262,12 +180,12 @@ const Login = () => {
       </div>
 
       {/* Main Content */}
-      <div className={`bg-white mx-3 rounded-t-[2rem] relative z-10 shadow-2xl ${isLogin && !showForgotPassword ? 'flex-1 overflow-hidden' : 'min-h-[65vh]'}`}>
-        <div className={`px-6 ${isLogin && !showForgotPassword ? 'pt-8 pb-6' : 'pt-10 pb-8'} ${!isLogin ? 'max-h-[calc(100vh-200px)] overflow-y-auto' : ''}`}>
+      <div className={`bg-white mx-3 -mt-2 rounded-t-[2rem] relative z-10 shadow-2xl ${!isLogin && !showForgotPassword ? 'flex-1 min-h-0 overflow-hidden' : 'min-h-[65vh]'}`}>
+        <div className={`px-6 ${isLogin && !showForgotPassword ? 'pt-6 pb-6' : 'pt-8 pb-8'} ${!isLogin ? 'max-h-[calc(100vh-200px)] overflow-y-auto' : ''}`}>
         {!showForgotPassword ? (
           <>
             {/* Google Sign-in at Top */}
-            <div className={`w-full flex justify-center ${isLogin && !showForgotPassword ? 'mb-6' : 'mb-10'}`}>
+            <div className={`w-full flex justify-center ${isLogin && !showForgotPassword ? 'mb-4' : 'mb-8'}`}>
               <GoogleLogin />
             </div>
 
@@ -284,7 +202,7 @@ const Login = () => {
             {/* Login/Signup Toggle */}
             <div className={`flex bg-gray-50 rounded-2xl p-1.5 ${isLogin && !showForgotPassword ? 'mb-6' : 'mb-8'} shadow-inner`}>
               <button
-                className={`flex-1 py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${
                   isLogin ? 'bg-cyan-400 text-white shadow-lg transform scale-[1.02]' : 'text-gray-500 hover:text-gray-700'
                 }`}
                 onClick={() => setIsLogin(true)}
@@ -292,7 +210,7 @@ const Login = () => {
                 Login
               </button>
               <button
-                className={`flex-1 py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${
                   !isLogin ? 'bg-cyan-400 text-white shadow-lg transform scale-[1.02]' : 'text-gray-500 hover:text-gray-700'  
                 }`}
                 onClick={() => setIsLogin(false)}
