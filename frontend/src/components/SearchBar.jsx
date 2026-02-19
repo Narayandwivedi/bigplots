@@ -181,7 +181,7 @@ const SearchBar = () => {
           {/* Search Input */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
               </svg>
             </div>
@@ -193,12 +193,12 @@ const SearchBar = () => {
               onKeyDown={handleKeyDown}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              className="w-full pl-9 sm:pl-10 pr-14 sm:pr-20 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none text-gray-900 placeholder-gray-500 text-sm sm:text-base"
+              className="w-full pl-9 sm:pl-10 pr-14 sm:pr-20 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none text-gray-900 placeholder-gray-500 text-sm sm:text-base"
             />
             <div className="absolute inset-y-0 right-0 pr-1.5 sm:pr-3 flex items-center">
               <button
                 onClick={() => handleSearch()}
-                className="bg-cyan-500 hover:bg-cyan-600 text-white px-2 sm:px-4 py-1.5 sm:py-2 rounded-md transition-colors duration-200 flex items-center justify-center"
+                className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:via-yellow-600 hover:to-amber-700 text-amber-950 px-2 sm:px-4 py-1.5 sm:py-2 rounded-md transition-all duration-200 flex items-center justify-center font-semibold shadow-[0_4px_10px_rgba(180,83,9,0.28)]"
               >
                 {/* Mobile: Show only search icon */}
                 <svg className="w-3.5 h-3.5 sm:hidden" fill="currentColor" viewBox="0 0 20 20">
@@ -219,13 +219,13 @@ const SearchBar = () => {
                   onClick={() => handleSuggestionClick(suggestion)}
                   className={`px-4 py-2 cursor-pointer text-gray-900 border-b border-gray-100 last:border-b-0 transition-colors ${
                     index === selectedSuggestionIndex 
-                      ? 'bg-cyan-50 text-cyan-900' 
+                      ? 'bg-amber-50 text-amber-900' 
                       : 'hover:bg-gray-50'
                   }`}
                 >
                   <div className="flex items-center space-x-2">
                     <svg className={`h-4 w-4 ${
-                      index === selectedSuggestionIndex ? 'text-cyan-500' : 'text-gray-400'
+                      index === selectedSuggestionIndex ? 'text-amber-500' : 'text-gray-400'
                     }`} fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
                     </svg>
