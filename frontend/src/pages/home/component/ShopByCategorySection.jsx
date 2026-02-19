@@ -159,24 +159,7 @@ const demoCategories = [
     imageClassName:
       "w-[100%] h-[100%] sm:w-[96%] sm:h-[96%] lg:w-[86%] lg:h-[86%]",
   },
-  {
-    name: "Grocery",
-    query: "grocery",
-    icon: Package,
-    gradient: "from-emerald-500 to-green-600",
-    image: "/grocery.avif",
-    imageClassName:
-      "w-[100%] h-[100%] sm:w-[96%] sm:h-[96%] lg:w-[86%] lg:h-[86%]",
-  },
-  {
-    name: "Dryfruits",
-    query: "dry fruits",
-    icon: Leaf,
-    gradient: "from-lime-500 to-green-600",
-    image: "/dryfruits.avif",
-    imageClassName:
-      "w-[100%] h-[100%] sm:w-[96%] sm:h-[96%] lg:w-[86%] lg:h-[86%]",
-  },
+ 
 
 
 ];
@@ -249,6 +232,30 @@ const flatCategory = {
   image: "/flat.avif",
   icon: Building2,
   gradient: "from-cyan-500 to-blue-600",
+  imageClassName:
+    "w-[100%] h-[100%] sm:w-[96%] sm:h-[96%] lg:w-[86%] lg:h-[86%]",
+};
+
+const plotCategory = {
+  _id: "static-plot",
+  name: "Plot",
+  query: "plot",
+  redirectUrl: "",
+  image: "/plot.avif",
+  icon: Building2,
+  gradient: "from-emerald-500 to-green-600",
+  imageClassName:
+    "w-[100%] h-[100%] sm:w-[96%] sm:h-[96%] lg:w-[86%] lg:h-[86%]",
+};
+
+const jobsCategory = {
+  _id: "static-jobs",
+  name: "Jobs",
+  query: "jobs",
+  redirectUrl: "",
+  image: "/jobs.avif",
+  icon: Package,
+  gradient: "from-indigo-500 to-blue-700",
   imageClassName:
     "w-[100%] h-[100%] sm:w-[96%] sm:h-[96%] lg:w-[86%] lg:h-[86%]",
 };
@@ -354,6 +361,8 @@ const ShopByCategorySection = () => {
       newBikeCategory,
       fullBodyCheckupCategory,
       flatCategory,
+      plotCategory,
+      jobsCategory,
     ];
 
     return requiredCategories.reduce((updatedCategories, requiredCategory) => {
