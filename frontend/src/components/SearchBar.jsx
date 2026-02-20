@@ -1,14 +1,56 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+const cityOptions = [
+  'Raipur',
+  'Jagdalpur',
+  'Bilaspur',
+  'Durg',
+  'Bhilai',
+  'Rajnandgaon',
+  'Korba',
+  'Ambikapur',
+  'Ranchi',
+  'Bhopal',
+  'Indore',
+  'Nagpur',
+  'Pune',
+  'Hyderabad',
+  'Bengaluru',
+  'Mumbai',
+  'Delhi',
+]
+
 const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [originalQuery, setOriginalQuery] = useState('') // Store the user's original input
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
+  const [selectedLocation, setSelectedLocation] = useState('Select location')
+  const [showLocationPopup, setShowLocationPopup] = useState(false)
+  const [citySearchQuery, setCitySearchQuery] = useState('')
   const navigate = useNavigate()
 
+  const filteredCities = citySearchQuery.trim()
+    ? cityOptions.filter((city) =>
+        city.toLowerCase().includes(citySearchQuery.toLowerCase().trim()),
+      )
+    : cityOptions
+
+  const openLocationPopup = () => {
+    setShowLocationPopup(true)
+  }
+
+  const closeLocationPopup = () => {
+    setShowLocationPopup(false)
+  }
+
+  const handleCitySelect = (city) => {
+    setSelectedLocation(city)
+    setCitySearchQuery('')
+    setShowLocationPopup(false)
+  }
 
   const handleInputChange = (e) => {
     const query = e.target.value
@@ -176,67 +218,151 @@ const SearchBar = () => {
   return (
     <div className="bg-white border-b border-gray-200 py-2 sm:py-3">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative max-w-2xl mx-auto">
-          {/* Search Input */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <input
-              type="text"
-              placeholder="Search onions, fruits, gold ..."
-              value={searchQuery}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              className="w-full pl-9 sm:pl-10 pr-14 sm:pr-20 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none text-gray-900 placeholder-gray-500 text-sm sm:text-base"
-            />
-            <div className="absolute inset-y-0 right-0 pr-1.5 sm:pr-3 flex items-center">
-              <button
-                onClick={() => handleSearch()}
-                className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:via-yellow-600 hover:to-amber-700 text-amber-950 px-2 sm:px-4 py-1.5 sm:py-2 rounded-md transition-all duration-200 flex items-center justify-center font-semibold shadow-[0_4px_10px_rgba(180,83,9,0.28)]"
-              >
-                {/* Mobile: Show only search icon */}
-                <svg className="w-3.5 h-3.5 sm:hidden" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+        <div className="mx-auto max-w-2xl lg:max-w-6xl lg:flex lg:items-center lg:gap-3">
+          <div className="mb-2 sm:mb-3 lg:mb-0 lg:w-[320px] lg:shrink-0">
+            <button
+              type="button"
+              onClick={openLocationPopup}
+              className="w-full flex items-center justify-between rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 px-3 py-1.5 text-left hover:border-amber-300 transition-colors"
+              aria-label="Select location"
+              title="Choose location"
+            >
+              <div className="flex items-center gap-2">
+                <svg className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.05 8.05a5 5 0 119.9 0c0 3.808-5 9.95-5 9.95s-5-6.142-5-9.95zM10 10a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                 </svg>
-                {/* Desktop: Show text */}
-                <span className="hidden sm:inline">Search</span>
-              </button>
-            </div>
+                <div>
+                  <p className="text-[10px] sm:text-xs text-amber-700">Address</p>
+                  <p className="text-xs sm:text-sm font-semibold text-gray-900">{selectedLocation}</p>
+                </div>
+              </div>
+
+              <span className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-white border border-amber-300 text-amber-700 flex items-center justify-center">
+                <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364-1.414-1.414M7.05 7.05 5.636 5.636m12.728 0-1.414 1.414M7.05 16.95l-1.414 1.414M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </span>
+            </button>
           </div>
 
-          {/* Search Suggestions */}
-          {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-              {suggestions.map((suggestion, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleSuggestionClick(suggestion)}
-                  className={`px-4 py-2 cursor-pointer text-gray-900 border-b border-gray-100 last:border-b-0 transition-colors ${
-                    index === selectedSuggestionIndex 
-                      ? 'bg-amber-50 text-amber-900' 
-                      : 'hover:bg-gray-50'
-                  }`}
+          <div className="relative lg:flex-1">
+            {/* Search Input */}
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Search onions, fruits, gold ..."
+                value={searchQuery}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                className="w-full pl-9 sm:pl-10 pr-14 sm:pr-20 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none text-gray-900 placeholder-gray-500 text-sm sm:text-base"
+              />
+              <div className="absolute inset-y-0 right-0 pr-1.5 sm:pr-3 flex items-center">
+                <button
+                  onClick={() => handleSearch()}
+                  className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:via-yellow-600 hover:to-amber-700 text-amber-950 px-2 sm:px-4 py-1.5 sm:py-2 rounded-md transition-all duration-200 flex items-center justify-center font-semibold shadow-[0_4px_10px_rgba(180,83,9,0.28)]"
                 >
-                  <div className="flex items-center space-x-2">
-                    <svg className={`h-4 w-4 ${
-                      index === selectedSuggestionIndex ? 'text-amber-500' : 'text-gray-400'
-                    }`} fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                    </svg>
-                    <span>{suggestion}</span>
-                  </div>
-                </div>
-              ))}
+                  {/* Mobile: Show only search icon */}
+                  <svg className="w-3.5 h-3.5 sm:hidden" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                  </svg>
+                  {/* Desktop: Show text */}
+                  <span className="hidden sm:inline">Search</span>
+                </button>
+              </div>
             </div>
-          )}
+
+            {/* Search Suggestions */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {suggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className={`px-4 py-2 cursor-pointer text-gray-900 border-b border-gray-100 last:border-b-0 transition-colors ${
+                      index === selectedSuggestionIndex 
+                        ? 'bg-amber-50 text-amber-900' 
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <svg className={`h-4 w-4 ${
+                        index === selectedSuggestionIndex ? 'text-amber-500' : 'text-gray-400'
+                      }`} fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                      </svg>
+                      <span>{suggestion}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
       </div>
+
+      {showLocationPopup && (
+        <div
+          className="fixed inset-0 z-50 bg-black/45 px-4 flex items-center justify-center"
+          onClick={closeLocationPopup}
+        >
+          <div
+            className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-4 sm:p-5"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900">
+                Choose Location
+              </h3>
+              <button
+                type="button"
+                onClick={closeLocationPopup}
+                className="text-gray-500 hover:text-gray-700"
+                aria-label="Close location popup"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="mt-3">
+              <input
+                type="text"
+                placeholder="Search city"
+                value={citySearchQuery}
+                onChange={(event) => setCitySearchQuery(event.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none text-sm"
+                autoFocus
+              />
+            </div>
+
+            <div className="mt-3 border border-gray-200 rounded-lg max-h-60 overflow-y-auto">
+              {filteredCities.length > 0 ? (
+                filteredCities.map((city) => (
+                  <button
+                    key={city}
+                    type="button"
+                    onClick={() => handleCitySelect(city)}
+                    className="w-full text-left px-3 py-2.5 text-sm text-gray-800 hover:bg-amber-50 border-b border-gray-100 last:border-b-0"
+                  >
+                    {city}
+                  </button>
+                ))
+              ) : (
+                <p className="px-3 py-4 text-sm text-gray-500">No city found</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

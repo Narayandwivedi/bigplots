@@ -61,6 +61,8 @@ const DEFAULT_HERO_TARGET_URL = '/';
 const HeroSection = () => {
   const [mobileTrackIndex, setMobileTrackIndex] = useState(MOBILE_CLONE_COUNT);
   const [isMobileTransitionEnabled, setIsMobileTransitionEnabled] = useState(true);
+  const [desktopTrackIndex, setDesktopTrackIndex] = useState(0);
+  const [isDesktopTransitionEnabled, setIsDesktopTransitionEnabled] = useState(true);
   const [isAutoPlayPaused, setIsAutoPlayPaused] = useState(false);
   const touchStartXRef = useRef(0);
   const touchCurrentXRef = useRef(0);
@@ -70,10 +72,19 @@ const HeroSection = () => {
   const resumeAutoAfterSwipeRef = useRef(false);
 
   const displayHeroes = demoHeroes;
+  const desktopVisibleCards = useMemo(
+    () => Math.max(displayHeroes.length, 1),
+    [displayHeroes.length],
+  );
+  const desktopCardWidthPercent = 100 / desktopVisibleCards;
 
   const mobileCloneCount = useMemo(
     () => Math.min(MOBILE_CLONE_COUNT, displayHeroes.length || 1),
     [displayHeroes.length],
+  );
+  const desktopCloneCount = useMemo(
+    () => Math.min(desktopVisibleCards, displayHeroes.length || 1),
+    [desktopVisibleCards, displayHeroes.length],
   );
 
   const mobileTrackHeroes = useMemo(() => {
@@ -84,12 +95,24 @@ const HeroSection = () => {
     const trailingClones = displayHeroes.slice(0, mobileCloneCount);
     return [...leadingClones, ...displayHeroes, ...trailingClones];
   }, [displayHeroes, mobileCloneCount]);
+  const desktopTrackHeroes = useMemo(() => {
+    if (displayHeroes.length === 0) return [];
+    if (displayHeroes.length === 1) return displayHeroes;
+
+    const leadingClones = displayHeroes.slice(-desktopCloneCount);
+    const trailingClones = displayHeroes.slice(0, desktopCloneCount);
+    return [...leadingClones, ...displayHeroes, ...trailingClones];
+  }, [displayHeroes, desktopCloneCount]);
 
   useEffect(() => {
     setMobileTrackIndex(displayHeroes.length > 1 ? mobileCloneCount : 0);
     setIsMobileTransitionEnabled(true);
     setIsAutoPlayPaused(false);
   }, [displayHeroes.length, mobileCloneCount]);
+  useEffect(() => {
+    setDesktopTrackIndex(displayHeroes.length > 1 ? desktopCloneCount : 0);
+    setIsDesktopTransitionEnabled(true);
+  }, [displayHeroes.length, desktopCloneCount]);
 
   useEffect(() => {
     if (displayHeroes.length <= 1 || isAutoPlayPaused) return undefined;
@@ -103,6 +126,18 @@ const HeroSection = () => {
       clearTimeout(startTimeoutId);
     };
   }, [displayHeroes.length, isAutoPlayPaused]);
+  useEffect(() => {
+    if (displayHeroes.length <= 1) return undefined;
+
+    const startTimeoutId = setTimeout(() => {
+      setIsDesktopTransitionEnabled(true);
+      setDesktopTrackIndex((prev) => prev + 1);
+    }, 60);
+
+    return () => {
+      clearTimeout(startTimeoutId);
+    };
+  }, [displayHeroes.length]);
 
   const handleMobileTransitionEnd = () => {
     if (displayHeroes.length <= 1) return;
@@ -218,6 +253,37 @@ const HeroSection = () => {
     touchStartYRef.current = 0;
     touchCurrentYRef.current = 0;
   };
+  const handleDesktopTransitionEnd = () => {
+    if (displayHeroes.length <= 1) return;
+
+    const maxTrackStartIndex = desktopCloneCount + displayHeroes.length;
+
+    if (desktopTrackIndex >= maxTrackStartIndex) {
+      setIsDesktopTransitionEnabled(false);
+      setDesktopTrackIndex((prev) => prev - displayHeroes.length);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsDesktopTransitionEnabled(true);
+          setDesktopTrackIndex((prev) => prev + 1);
+        });
+      });
+      return;
+    }
+
+    if (desktopTrackIndex < desktopCloneCount) {
+      setIsDesktopTransitionEnabled(false);
+      setDesktopTrackIndex((prev) => prev + displayHeroes.length);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsDesktopTransitionEnabled(true);
+          setDesktopTrackIndex((prev) => prev + 1);
+        });
+      });
+      return;
+    }
+
+    setDesktopTrackIndex((prev) => prev + 1);
+  };
 
   const renderHeroItem = (hero, index, keyPrefix = 'hero') => {
     const imageSrc = hero.imageUrl;
@@ -300,8 +366,25 @@ const HeroSection = () => {
         </div>
       </div>
 
-      <div className="hidden lg:grid lg:grid-cols-5 gap-2 md:gap-4 items-center">
-        {displayHeroes.map((hero, index) => renderHeroItem(hero, index, 'desktop'))}
+      <div className="hidden lg:block relative overflow-hidden">
+        <div
+          className={`${isDesktopTransitionEnabled ? 'transition-transform duration-[900ms] ease-linear' : 'transition-none'} flex select-none`}
+          style={{
+            transform: `translateX(-${desktopTrackIndex * desktopCardWidthPercent}%)`,
+          }}
+          onTransitionEnd={handleDesktopTransitionEnd}
+          onContextMenu={(event) => event.preventDefault()}
+        >
+          {desktopTrackHeroes.map((hero, index) => (
+            <div
+              key={`desktop-hero-${hero._id || index}-${index}`}
+              className="shrink-0 px-1 md:px-2"
+              style={{ width: `${desktopCardWidthPercent}%` }}
+            >
+              {renderHeroItem(hero, index, `desktop-${index}`)}
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

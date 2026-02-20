@@ -23,7 +23,7 @@ const createOrder = async (req, res) => {
       customerInfo = {
         name: user.fullName,
         email: user.email,
-        phone: user.phone || '0000000000' // Provide default phone if user doesn't have one
+        phone: user.phone
       };
     } else {
       return res.status(401).json({
@@ -60,8 +60,7 @@ const createOrder = async (req, res) => {
         pincode: selectedAddress.postalCode
       };
       
-      // Update phone from address if user doesn't have phone
-      if (customerInfo.phone === '0000000000' && selectedAddress.phone) {
+      if (!customerInfo.phone && selectedAddress.phone) {
         customerInfo.phone = selectedAddress.phone;
       }
     }
@@ -130,17 +129,6 @@ const createOrder = async (req, res) => {
     });
 
     const savedOrder = await newOrder.save();
-
-    // Add order to user's order history if user is logged in
-    if (userId) {
-      await User.findByIdAndUpdate(
-        userId,
-        { 
-          $push: { orders: savedOrder._id },
-          $inc: { totalOrders: 1 }
-        }
-      );
-    }
 
     // Update product stock quantities
     for (const item of processedItems) {

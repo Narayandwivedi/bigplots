@@ -101,7 +101,6 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'approved', 'rejected', 'flagged'],
     default: 'pending',
-    index: true
   },
   
   // Admin moderation

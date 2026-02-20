@@ -11,8 +11,6 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
-    unique: true,
     lowercase: true,
     trim: true,
     match: [
@@ -23,15 +21,28 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: function() {
-      return !this.googleId && !this.facebookId && !this.oauthProvider;
+      return !this.googleId && !this.oauthProvider;
     },
     minlength: [6, 'Password must be at least 6 characters'],
     select: false // Don't include password in queries by default
   },
   phone: {
     type: String,
+    required: [true, 'Phone number is required'],
     trim: true,
     match: [/^\+?[\d\s\-\(\)]{10,15}$/, 'Please provide a valid phone number']
+  },
+  city: {
+    type: String,
+    trim: true
+  },
+  district: {
+    type: String,
+    trim: true
+  },
+  state: {
+    type: String,
+    trim: true
   },
   dateOfBirth: {
     type: Date
@@ -43,12 +54,7 @@ const userSchema = new mongoose.Schema({
 
   // OAuth Information
   googleId: {
-    type: String,
-    sparse: true // Allow multiple null values but unique non-null values
-  },
-  facebookId: {
-    type: String,
-    sparse: true
+    type: String
   },
   oauthProvider: {
     type: String,
@@ -129,12 +135,6 @@ const userSchema = new mongoose.Schema({
     default: true
   },
 
-  role: {
-    type: String,
-    enum: ['user', 'admin', 'moderator'],
-    default: 'user'
-  },
-
   cart: [{
     product: {
       type: mongoose.Schema.Types.ObjectId,
@@ -153,25 +153,9 @@ const userSchema = new mongoose.Schema({
     }
   }],
 
-  // Order History References
-  orders: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Order'
-  }],
-
- 
-  // Analytics
-  totalOrders: {
-    type: Number,
-    default: 0
-  },
 }, {
   timestamps: true,
 });
-
-// Indexes for better performance
-userSchema.index({ email: 1 });
-userSchema.index({ phone: 1 });
 
 
 
@@ -272,6 +256,9 @@ userSchema.methods.setDefaultAddress = function(addressId) {
 
 // Static method to find user by email
 userSchema.statics.findByEmail = function(email) {
+  if (!email || typeof email !== 'string') {
+    return null;
+  }
   return this.findOne({ email: email.toLowerCase() });
 };
 

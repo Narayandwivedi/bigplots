@@ -12,41 +12,56 @@ const handelUserSignup = async (req, res) => {
       return res.status(400).json({ success: false, message: "missing data" });
     }
 
-    let { fullName, email, password, mobile } = req.body;
+    let { fullName, email, password, mobile, phone, city, district, state } =
+      req.body;
 
     // Trim input fields
     fullName = fullName?.trim();
-    email = email?.trim();
+    email = email?.trim()?.toLowerCase();
     password = password?.trim();
+    const resolvedPhone = String(phone || mobile || "").trim();
 
-    if (!fullName || !email || !password) {
+    if (!fullName || !password || !resolvedPhone) {
       return res.status(400).json({ success: false, message: "missing field" });
     }
 
-    // Validate mobile number if provided (optional for e-commerce)
-    if (mobile && (mobile < 6000000000 || mobile > 9999999999)) {
+    // Email is optional. If sent, validate format.
+    if (
+      email &&
+      !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Please enter a valid mobile number",
+        message: "Please enter a valid email address",
       });
     }
 
-    // Check if user already exists by email or mobile
-    const query = mobile ? { $or: [{ email }, { mobile }] } : { email };
+    // Phone is mandatory.
+    if (!/^\+?[\d\s\-\(\)]{10,15}$/.test(resolvedPhone)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid phone number",
+      });
+    }
 
-    const existingUser = await userModel.findOne(query);
+    // Check duplicate by phone and, if present, email.
+    const duplicateFilter = [{ phone: resolvedPhone }];
+    if (email) {
+      duplicateFilter.push({ email });
+    }
+    const existingUser = await userModel.findOne({ $or: duplicateFilter });
 
     if (existingUser) {
-      if (existingUser.email === email) {
+      if (email && existingUser.email === email) {
         return res.status(400).json({
           success: false,
           message: "Email already exists",
         });
       }
-      if (existingUser.mobile === mobile) {
+      if (existingUser.phone === resolvedPhone) {
         return res.status(400).json({
           success: false,
-          message: "Mobile number already exists",
+          message: "Phone number already exists",
         });
       }
     }
@@ -56,9 +71,12 @@ const handelUserSignup = async (req, res) => {
 
     const newUserData = {
       fullName,
-      email,
+      email: email || undefined,
       password: hashedPassword,
-      mobile: mobile || null,
+      phone: resolvedPhone,
+      city: city?.trim() || undefined,
+      district: district?.trim() || undefined,
+      state: state?.trim() || undefined,
       isEmailVerified: false,
     };
 
@@ -67,7 +85,7 @@ const handelUserSignup = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: newUser._id, role: newUser.role },
+      { userId: newUser._id, role: "user" },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE || "30d" }
     );
@@ -103,32 +121,34 @@ const handelUserLogin = async (req, res) => {
     if (!emailOrMobile || !password) {
       return res.status(400).json({
         success: false,
-        message: "Email/Mobile and password are required",
+        message: "Email/Phone and password are required",
       });
     }
 
-    // Check if input is email or mobile number
-    const isEmail = emailOrMobile.includes("@");
-    const isMobile = /^[6-9]\d{9}$/.test(emailOrMobile);
+    const loginIdentifier = String(emailOrMobile).trim();
+
+    // Check if input is email or phone number
+    const isEmail = loginIdentifier.includes("@");
+    const isMobile = /^\+?[\d\s\-\(\)]{10,15}$/.test(loginIdentifier);
 
     if (!isEmail && !isMobile) {
       return res.status(400).json({
         success: false,
-        message: "Please enter a valid email or mobile number",
+        message: "Please enter a valid email or phone number",
       });
     }
 
-    // Find user by email or mobile
+    // Find user by email or phone
     const query = isEmail
-      ? { email: emailOrMobile }
-      : { mobile: parseInt(emailOrMobile) };
+      ? { email: loginIdentifier.toLowerCase() }
+      : { phone: loginIdentifier };
 
     const user = await userModel.findOne(query).select("+password");
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: isEmail ? "Invalid email" : "Invalid mobile number",
+        message: isEmail ? "Invalid email" : "Invalid phone number",
       });
     }
 
@@ -140,7 +160,7 @@ const handelUserLogin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, role: "user" },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE || "30d" }
     );
@@ -157,10 +177,6 @@ const handelUserLogin = async (req, res) => {
     delete userObj.password;
     delete userObj.resetOtp;
     delete userObj.otpExpiresAt;
-
-    // Update last active time
-    user.lastActive = new Date();
-    await user.save();
 
     return res.status(200).json({
       success: true,
@@ -191,14 +207,16 @@ const handleUserLogout = async (req, res) => {
 
 const generateResetPassOTP = async (req, res) => {
   try {
-    const { email } = req.body;
-    if (!email) {
+    const normalizedEmail = String(req.body?.email || "")
+      .trim()
+      .toLowerCase();
+    if (!normalizedEmail) {
       return res
         .status(400)
         .json({ success: false, message: "Please provide email address" });
     }
 
-    const getUser = await userModel.findOne({ email });
+    const getUser = await userModel.findOne({ email: normalizedEmail });
 
     if (!getUser) {
       return res.status(400).json({
@@ -214,7 +232,7 @@ const generateResetPassOTP = async (req, res) => {
 
     const mailOptions = {
       from: process.env.EMAIL_USER || "noreply@computerstore.com",
-      to: email,
+      to: normalizedEmail,
       subject: "Password Reset OTP - Computer Store",
       text: `Your OTP for password reset is: ${otp}. It will expire in 10 minutes.`,
     };
@@ -232,12 +250,13 @@ const generateResetPassOTP = async (req, res) => {
 const submitResetPassOTP = async (req, res) => {
   try {
     const { otp, newPass, email } = req.body;
+    const normalizedEmail = String(email || "").trim().toLowerCase();
 
-    if (!otp || !newPass || !email) {
+    if (!otp || !newPass || !normalizedEmail) {
       return res.status(400).json({ success: false, message: "Missing data" });
     }
 
-    const getUser = await userModel.findOne({ email });
+    const getUser = await userModel.findOne({ email: normalizedEmail });
     if (!getUser) {
       return res
         .status(400)
@@ -312,10 +331,6 @@ const isloggedin = async (req, res) => {
     // Convert to object for manipulation
     const userObj = user.toObject();
 
-    // Update last active time
-    user.lastActive = new Date();
-    await user.save();
-
     return res.status(200).json({ isLoggedIn: true, user: userObj });
   } catch (err) {
     return res
@@ -327,7 +342,8 @@ const isloggedin = async (req, res) => {
 // Google OAuth Handler
 const handleGoogleAuth = async (req, res) => {
   try {
-    const { credential } = req.body;
+    const { credential, phone, mobile, city, district, state } = req.body;
+    const providedPhone = String(phone || mobile || "").trim();
 
     if (!credential) {
       return res.status(400).json({
@@ -361,38 +377,55 @@ const handleGoogleAuth = async (req, res) => {
 
     // Check if user exists
     let user = await userModel.findOne({
-      $or: [{ email: email }, { googleId: googleId }],
+      $or: [{ email: String(email).toLowerCase() }, { googleId: googleId }],
     });
 
     if (user) {
       // User exists, update Google info if needed
       if (!user.googleId) {
-        user.googleId = googleId;
-        user.profilePicture = profilePicture;
-        user.oauthProvider = "google";
-        user.isEmailVerified = true;
-        await user.save();
+        await userModel.findByIdAndUpdate(user._id, {
+          googleId,
+          profilePicture,
+          oauthProvider: "google",
+          isEmailVerified: true,
+        });
+        user = await userModel.findById(user._id);
       }
     } else {
+      if (!providedPhone) {
+        return res.status(400).json({
+          success: false,
+          message: "Phone number is required for new Google signup",
+        });
+      }
+
+      if (!/^\+?[\d\s\-\(\)]{10,15}$/.test(providedPhone)) {
+        return res.status(400).json({
+          success: false,
+          message: "Please enter a valid phone number",
+        });
+      }
+
       // Create new user
       const newUserData = {
         fullName,
-        email,
+        email: String(email).toLowerCase(),
+        phone: providedPhone,
+        city: city?.trim() || undefined,
+        district: district?.trim() || undefined,
+        state: state?.trim() || undefined,
         googleId,
         profilePicture,
         isEmailVerified: email_verified,
         oauthProvider: "google",
-        // Don't set password for Google users
-        // Don't set mobile for Google users (will be null)
       };
 
-      user = new userModel(newUserData);
-      await user.save();
+      user = await userModel.create(newUserData);
     }
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, role: "user" },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE || "30d" }
     );
