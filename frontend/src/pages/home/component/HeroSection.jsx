@@ -18,6 +18,13 @@ const demoHeroes = [
     linkUrl: '',
     stripText: '25 Acre Land Near korba',
   },
+  {
+    _id: 'demo-8',
+    imageUrl: '/land10.webp',
+    title: 'Land Banner 10',
+    linkUrl: '',
+    stripText: '25 Acre Land Near korba',
+  },
 ];
 
 const MOBILE_VISIBLE_CARDS = 2;
