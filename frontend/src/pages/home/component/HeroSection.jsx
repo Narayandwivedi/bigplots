@@ -55,6 +55,7 @@ const demoHeroes = [
 const MOBILE_VISIBLE_CARDS = 2;
 const MOBILE_CLONE_COUNT = MOBILE_VISIBLE_CARDS;
 const MOBILE_CARD_WIDTH_PERCENT = 100 / MOBILE_VISIBLE_CARDS;
+const DESKTOP_VISIBLE_CARDS = 5;
 const MOBILE_SWIPE_THRESHOLD_PX = 22;
 const DEFAULT_HERO_TARGET_URL = '/';
 
@@ -73,7 +74,7 @@ const HeroSection = () => {
 
   const displayHeroes = demoHeroes;
   const desktopVisibleCards = useMemo(
-    () => Math.max(displayHeroes.length, 1),
+    () => Math.min(DESKTOP_VISIBLE_CARDS, Math.max(displayHeroes.length, 1)),
     [displayHeroes.length],
   );
   const desktopCardWidthPercent = 100 / desktopVisibleCards;

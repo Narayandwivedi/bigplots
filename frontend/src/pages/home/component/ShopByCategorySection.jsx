@@ -52,7 +52,7 @@ const ShopByCategorySection = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 sm:grid-cols-5 gap-x-1.5 gap-y-1 sm:gap-4 md:gap-5">
+        <div className="grid grid-cols-4 gap-x-1.5 gap-y-1 sm:gap-6 lg:w-fit lg:mx-auto lg:justify-items-center">
           {landCategories.map((category) => {
             const Icon = category.icon;
             const destination = getCategoryDestination(category);
@@ -61,15 +61,15 @@ const ShopByCategorySection = () => {
               <Link
                 key={category._id}
                 to={destination}
-                className="group aspect-[0.92/1] sm:aspect-square rounded-lg sm:rounded-2xl border border-slate-200/80 bg-white p-1 sm:p-3 shadow-[0_4px_10px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(14,116,144,0.18)]"
+                className="group aspect-[0.92/1] sm:aspect-square lg:aspect-[0.9/1] rounded-lg sm:rounded-2xl border border-slate-200/80 bg-white p-1 sm:p-3 lg:p-2 lg:max-w-[190px] lg:mx-auto shadow-[0_4px_10px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(14,116,144,0.18)]"
                 aria-label={category.name}
                 title={category.name}
               >
                 <div
-                  className={`w-full h-full rounded-md sm:rounded-xl bg-gradient-to-br ${category.gradient} text-white flex flex-col items-center justify-center gap-0.5 sm:gap-2 px-1 sm:px-2 text-center`}
+                  className={`w-full h-full rounded-md sm:rounded-xl bg-gradient-to-br ${category.gradient} text-white flex flex-col items-center justify-center gap-0.5 sm:gap-2 lg:gap-1.5 px-1 sm:px-2 lg:px-1.5 text-center`}
                 >
-                  <Icon className="w-5 h-5 sm:w-10 sm:h-10 drop-shadow-[0_4px_8px_rgba(0,0,0,0.25)]" />
-                  <span className="text-[8px] sm:text-sm font-bold leading-none sm:leading-tight">
+                  <Icon className="w-5 h-5 sm:w-10 sm:h-10 lg:w-8 lg:h-8 drop-shadow-[0_4px_8px_rgba(0,0,0,0.25)]" />
+                  <span className="text-[8px] sm:text-sm lg:text-xs font-bold leading-none sm:leading-tight">
                     {category.name}
                   </span>
                 </div>
