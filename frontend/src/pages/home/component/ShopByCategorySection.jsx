@@ -384,22 +384,12 @@ const ShopByCategorySection = () => {
     <section className="bg-gradient-to-b from-white via-white to-cyan-50/70 pt-2 pb-2 md:py-10">
       <div className="max-w-[86rem] mx-auto px-1 sm:px-6 lg:px-8">
         <div className="mb-2 sm:mb-4">
-          <div className="mx-auto flex w-full max-w-xl items-center justify-center">
-            <div className="relative left-1 sm:left-2 md:left-3 inline-flex items-center gap-3 sm:gap-4">
-              <img
-                src="/topdeal.avif"
-                alt="Top Deal"
-                className="w-44 sm:w-56 md:w-64 h-auto rounded-md object-contain"
-                loading="lazy"
-              />
-              <img
-                src="/topdeal.avif"
-                alt="Top Deal"
-                className="w-44 sm:w-56 md:w-64 h-auto rounded-md object-contain"
-                loading="lazy"
-              />
-            </div>
-          </div>
+          <img
+            src="/hotdeals.png"
+            alt="Hot Deals"
+            className="block mr-auto w-1/2 max-w-[32rem] h-auto rounded-md object-contain"
+            loading="lazy"
+          />
         </div>
         <div className="grid grid-cols-4 lg:grid-cols-6 gap-1.5 sm:gap-4 md:gap-5">
           {displayCategories.map((category, index) => {
