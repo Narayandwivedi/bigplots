@@ -12,8 +12,8 @@ const Footer = () => {
               <div className="sm:mb-2.5">
                 <Link to="/" className="inline-flex items-center">
                   <img
-                    src="/abcdlogof.webp"
-                    alt="ABCD Market Logo"
+                    src="/bigplots.webp"
+                    alt="Bigplots Logo"
                     className="mt-2 sm:mt-0 w-30 h-[64px] object-cover block sm:h-40 sm:w-40 sm:object-contain"
                   />
                 </Link>

@@ -1,22 +1,56 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import axios from 'axios';
-import { AppContext } from '../../../context/AppContext';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 const demoHeroes = [
-  { _id: 'demo-1', imageUrl: '/banana.png', title: 'Banana Banner', linkUrl: '' },
-  { _id: 'demo-2', imageUrl: '/apple.avif', title: 'Apple Banner', linkUrl: '' },
-  { _id: 'demo-3', imageUrl: '/onion.png', title: 'Onion Banner', linkUrl: '' },
-  { _id: 'demo-4', imageUrl: '/almond.avif', title: 'Almond Banner', linkUrl: '' }
+  {
+    _id: 'demo-1',
+    imageUrl: '/land1.avif',
+    title: 'Land Banner 1',
+    linkUrl: '',
+    stripText: '5 Acre Land Near Raipur',
+  },
+  {
+    _id: 'demo-2',
+    imageUrl: '/land2.jpg',
+    title: 'Land Banner 2',
+    linkUrl: '',
+    stripText: '5 Acre Land Near Raipur',
+  },
+  {
+    _id: 'demo-3',
+    imageUrl: '/land3.jpg',
+    title: 'Land Banner 3',
+    linkUrl: '',
+    stripText: '5 Acre Land Near Raipur',
+  },
+  {
+    _id: 'demo-4',
+    imageUrl: '/land4.jpg',
+    title: 'Land Banner 4',
+    linkUrl: '',
+    stripText: '25 Acre Land Near Jagdalpur',
+  },
+  {
+    _id: 'demo-5',
+    imageUrl: '/land5.jpg',
+    title: 'Land Banner 5',
+    linkUrl: '',
+    stripText: '25 Acre Land Near Jagdalpur',
+  },
+  {
+    _id: 'demo-6',
+    imageUrl: '/land7.jpg',
+    title: 'Land Banner 6',
+    linkUrl: '',
+    stripText: '5 Acre Land Near Raipur',
+  },
+  {
+    _id: 'demo-7',
+    imageUrl: '/land8.jpg',
+    title: 'Land Banner 7',
+    linkUrl: '',
+    stripText: '25 Acre Land Near Jagdalpur',
+  },
 ];
-
-const resolveHeroImageUrl = (backendUrl, imageUrl) => {
-  if (!imageUrl) return '';
-  if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
-  if (imageUrl.startsWith('/uploads')) {
-    return `${backendUrl}${imageUrl}`;
-  }
-  return imageUrl;
-};
 
 const MOBILE_VISIBLE_CARDS = 2;
 const MOBILE_CLONE_COUNT = MOBILE_VISIBLE_CARDS;
@@ -25,8 +59,6 @@ const MOBILE_SWIPE_THRESHOLD_PX = 22;
 const DEFAULT_HERO_TARGET_URL = '/';
 
 const HeroSection = () => {
-  const { BACKEND_URL } = useContext(AppContext);
-  const [heroes, setHeroes] = useState([]);
   const [mobileTrackIndex, setMobileTrackIndex] = useState(MOBILE_CLONE_COUNT);
   const [isMobileTransitionEnabled, setIsMobileTransitionEnabled] = useState(true);
   const [isAutoPlayPaused, setIsAutoPlayPaused] = useState(false);
@@ -37,40 +69,7 @@ const HeroSection = () => {
   const didSwipeRef = useRef(false);
   const resumeAutoAfterSwipeRef = useRef(false);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchHeroes = async () => {
-      try {
-        const response = await axios.get(`${BACKEND_URL}/api/heroes?limit=4`);
-        const heroList = Array.isArray(response.data?.data) ? response.data.data : [];
-
-        if (isMounted) {
-          setHeroes(heroList.slice(0, 4));
-        }
-      } catch (error) {
-        if (isMounted) {
-          setHeroes([]);
-        }
-      }
-    };
-
-    fetchHeroes();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [BACKEND_URL]);
-
-  const displayHeroes = useMemo(() => {
-    if (heroes.length === 0) return demoHeroes;
-
-    const normalizedHeroes = heroes.slice(0, 4);
-    if (normalizedHeroes.length >= 4) return normalizedHeroes;
-
-    const missingCount = 4 - normalizedHeroes.length;
-    return [...normalizedHeroes, ...demoHeroes.slice(0, missingCount)];
-  }, [heroes]);
+  const displayHeroes = demoHeroes;
 
   const mobileCloneCount = useMemo(
     () => Math.min(MOBILE_CLONE_COUNT, displayHeroes.length || 1),
@@ -221,25 +220,33 @@ const HeroSection = () => {
   };
 
   const renderHeroItem = (hero, index, keyPrefix = 'hero') => {
-    const imageSrc = resolveHeroImageUrl(BACKEND_URL, hero.imageUrl);
+    const imageSrc = hero.imageUrl;
     const altText = hero.title || `Hero banner ${index + 1}`;
+    const stripText = String(hero.stripText || '').trim() || 'Land for Sale';
     const destinationUrl = String(hero.linkUrl || '').trim() || DEFAULT_HERO_TARGET_URL;
     const isExternal = /^https?:\/\//i.test(destinationUrl);
 
     const imageNode = (
-      <img
-        src={imageSrc}
-        alt={altText}
-        className="w-full h-auto block rounded-md"
-        draggable={false}
-        onDragStart={(event) => event.preventDefault()}
-        onContextMenu={(event) => event.preventDefault()}
-        style={{
-          userSelect: 'none',
-          WebkitUserDrag: 'none',
-          WebkitTouchCallout: 'none',
-        }}
-      />
+      <div className="relative overflow-hidden rounded-md">
+        <img
+          src={imageSrc}
+          alt={altText}
+          className="w-full h-auto block"
+          draggable={false}
+          onDragStart={(event) => event.preventDefault()}
+          onContextMenu={(event) => event.preventDefault()}
+          style={{
+            userSelect: 'none',
+            WebkitUserDrag: 'none',
+            WebkitTouchCallout: 'none',
+          }}
+        />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-r from-black/75 via-slate-900/70 to-black/75 px-2 py-1 sm:px-3 sm:py-1.5">
+          <span className="block truncate text-[10px] sm:text-xs md:text-sm font-semibold uppercase tracking-wide text-white text-center">
+            {stripText}
+          </span>
+        </div>
+      </div>
     );
 
     return (
@@ -293,7 +300,7 @@ const HeroSection = () => {
         </div>
       </div>
 
-      <div className="hidden lg:grid lg:grid-cols-4 gap-2 md:gap-4 items-center">
+      <div className="hidden lg:grid lg:grid-cols-5 gap-2 md:gap-4 items-center">
         {displayHeroes.map((hero, index) => renderHeroItem(hero, index, 'desktop'))}
       </div>
     </section>

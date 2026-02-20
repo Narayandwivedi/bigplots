@@ -73,8 +73,8 @@ const Navbar = () => {
             <Link to="/" className="flex items-center group">
               <div className="relative">
                 <img
-                  src="/abcdlogof.webp"
-                  alt="ABCD Market Logo"
+                  src="/bigplots.webp"
+                  alt="Bigplots Logo"
                   className="h-40 w-40 sm:h-38 sm:w-38 object-contain"
                 />
               </div>
