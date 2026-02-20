@@ -102,7 +102,7 @@ const Footer = () => {
                     <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                     <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                   </svg>
-                  <span className="text-xs sm:text-sm">info@gchub.in</span>
+                  <span className="text-xs sm:text-sm">info@bigplots.in</span>
                 </li>
               </ul>
             </div>
@@ -112,7 +112,7 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="border-t border-gray-700 mt-3 sm:mt-4 md:mt-5 pt-2.5 sm:pt-3 md:pt-4 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-xs sm:text-sm">
-            (c) 2024 GC HUB. All rights reserved.
+            (c) 2024 Bigplots. All rights reserved.
           </p>
           <div className="flex space-x-2 sm:space-x-4 mt-1.5 sm:mt-2.5 md:mt-0">
             <a href="#" className="text-gray-400 hover:text-cyan-300 text-xs sm:text-sm transition-colors duration-200 cursor-pointer">

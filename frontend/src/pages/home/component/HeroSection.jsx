@@ -1,54 +1,22 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 const demoHeroes = [
-  {
-    _id: 'demo-1',
-    imageUrl: '/land1.avif',
-    title: 'Land Banner 1',
-    linkUrl: '',
-    stripText: '5 Acre Land Near Raipur',
-  },
-  {
-    _id: 'demo-2',
-    imageUrl: '/land2.jpg',
-    title: 'Land Banner 2',
-    linkUrl: '',
-    stripText: '5 Acre Land Near Raipur',
-  },
-  {
-    _id: 'demo-3',
-    imageUrl: '/land3.jpg',
-    title: 'Land Banner 3',
-    linkUrl: '',
-    stripText: '5 Acre Land Near Raipur',
-  },
-  {
-    _id: 'demo-4',
-    imageUrl: '/land4.jpg',
-    title: 'Land Banner 4',
-    linkUrl: '',
-    stripText: '25 Acre Land Near Jagdalpur',
-  },
-  {
-    _id: 'demo-5',
-    imageUrl: '/land5.jpg',
-    title: 'Land Banner 5',
-    linkUrl: '',
-    stripText: '25 Acre Land Near Jagdalpur',
-  },
-  {
-    _id: 'demo-6',
-    imageUrl: '/land7.jpg',
-    title: 'Land Banner 6',
-    linkUrl: '',
-    stripText: '5 Acre Land Near Raipur',
-  },
+
+
+ 
   {
     _id: 'demo-7',
     imageUrl: '/land8.jpg',
     title: 'Land Banner 7',
     linkUrl: '',
-    stripText: '25 Acre Land Near Jagdalpur',
+    stripText: '25 Acre Land Near Jag',
+  },
+  {
+    _id: 'demo-8',
+    imageUrl: '/land9.avif',
+    title: 'Land Banner 8',
+    linkUrl: '',
+    stripText: '25 Acre Land Near korba',
   },
 ];
 
@@ -294,7 +262,7 @@ const HeroSection = () => {
     const isExternal = /^https?:\/\//i.test(destinationUrl);
 
     const imageNode = (
-      <div className="relative overflow-hidden rounded-md">
+      <div className="overflow-hidden rounded-md">
         <img
           src={imageSrc}
           alt={altText}
@@ -308,7 +276,7 @@ const HeroSection = () => {
             WebkitTouchCallout: 'none',
           }}
         />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-r from-black/75 via-slate-900/70 to-black/75 px-2 py-1 sm:px-3 sm:py-1.5">
+        <div className="border-t border-slate-200 bg-gradient-to-r from-black/75 via-slate-900/70 to-black/75 px-2 py-1 sm:px-3 sm:py-1.5">
           <span className="block truncate text-[10px] sm:text-xs md:text-sm font-semibold uppercase tracking-wide text-white text-center">
             {stripText}
           </span>
