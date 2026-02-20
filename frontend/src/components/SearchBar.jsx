@@ -27,7 +27,7 @@ const SearchBar = () => {
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
-  const [selectedLocation, setSelectedLocation] = useState('Select location')
+  const [selectedLocation, setSelectedLocation] = useState('')
   const [showLocationPopup, setShowLocationPopup] = useState(false)
   const [citySearchQuery, setCitySearchQuery] = useState('')
   const navigate = useNavigate()
@@ -51,6 +51,8 @@ const SearchBar = () => {
     setCitySearchQuery('')
     setShowLocationPopup(false)
   }
+
+  const locationLabel = selectedLocation.trim() || 'Select location'
 
   const handleInputChange = (e) => {
     const query = e.target.value
@@ -223,24 +225,15 @@ const SearchBar = () => {
             <button
               type="button"
               onClick={openLocationPopup}
-              className="w-full flex items-center justify-between rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 px-3 py-1.5 text-left hover:border-amber-300 transition-colors"
+              className="w-full h-8 sm:h-9 flex items-center rounded-lg border border-sky-200 bg-gradient-to-r from-sky-50 to-blue-100 px-3 text-left hover:border-sky-300 transition-colors"
               aria-label="Select location"
               title="Choose location"
             >
-              <div className="flex items-center gap-2">
-                <svg className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.05 8.05a5 5 0 119.9 0c0 3.808-5 9.95-5 9.95s-5-6.142-5-9.95zM10 10a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                </svg>
-                <div>
-                  <p className="text-[10px] sm:text-xs text-amber-700">Address</p>
-                  <p className="text-xs sm:text-sm font-semibold text-gray-900">{selectedLocation}</p>
-                </div>
-              </div>
-
-              <span className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-white border border-amber-300 text-amber-700 flex items-center justify-center">
-                <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364-1.414-1.414M7.05 7.05 5.636 5.636m12.728 0-1.414 1.414M7.05 16.95l-1.414 1.414M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+              <svg className="h-4 w-4 sm:h-5 sm:w-5 text-slate-900 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5.05 8.05a5 5 0 119.9 0c0 3.808-5 9.95-5 9.95s-5-6.142-5-9.95zM10 10a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+              </svg>
+              <span className="ml-2 text-xs sm:text-[13px] font-semibold text-gray-900 truncate">
+                {locationLabel}
               </span>
             </button>
           </div>
