@@ -15,6 +15,15 @@ const MobileBottomNav = () => {
       )
     },
     {
+      path: '/contact',
+      name: 'Sell Plot',
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M12 7v10m5-5H7" />
+        </svg>
+      )
+    },
+    {
       path: '/account',
       name: 'Account',
       icon: (
@@ -26,24 +35,41 @@ const MobileBottomNav = () => {
   ]
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-lg">
-      <div className="flex justify-evenly items-center py-1">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-lg overflow-visible">
+      <div className="flex justify-evenly items-end py-1">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
+          const isSellItem = item.path === '/contact'
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center py-1 px-3 rounded-lg transition-colors duration-200 relative ${
-                isActive 
-                  ? 'text-cyan-500 bg-cyan-50' 
-                  : 'text-gray-600 hover:text-cyan-500 hover:bg-gray-50'
+              className={`flex flex-col items-center rounded-lg relative ${
+                isSellItem
+                  ? 'px-3 py-1 text-cyan-700 transition-all duration-200'
+                  : `py-1 px-3 transition-colors duration-200 ${
+                      isActive 
+                        ? 'text-cyan-500 bg-cyan-50' 
+                      : 'text-gray-600 hover:text-cyan-500 hover:bg-gray-50'
+                    }`
               }`}
             >
-              <div className="relative">
-                {item.icon}
+              <div className={isSellItem ? 'relative h-4 w-4' : 'relative'}>
+                {isSellItem ? (
+                  <span
+                    className={`absolute -top-5 left-1/2 -translate-x-1/2 h-9 w-9 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 text-white border-2 border-white shadow-[0_6px_16px_rgba(14,116,144,0.35)] flex items-center justify-center ${
+                      isActive ? 'ring-2 ring-cyan-200' : ''
+                    }`}
+                  >
+                    {item.icon}
+                  </span>
+                ) : (
+                  item.icon
+                )}
               </div>
-              <span className="text-[10px] mt-0.5 font-medium">{item.name}</span>
+              <span className={`text-[10px] mt-0.5 ${isSellItem ? 'font-semibold' : 'font-medium'}`}>
+                {item.name}
+              </span>
             </Link>
           )
         })}
