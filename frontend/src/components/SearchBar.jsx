@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { LocateFixed } from 'lucide-react'
 
 const cityOptions = [
   'Raipur',
@@ -49,6 +50,9 @@ const SearchBar = () => {
   const handleCitySelect = (city) => {
     setSelectedLocation(city)
     setCitySearchQuery('')
+    setShowLocationPopup(false)
+  }
+  const handleUseCurrentLocation = () => {
     setShowLocationPopup(false)
   }
 
@@ -327,6 +331,7 @@ const SearchBar = () => {
             </div>
 
             <div className="mt-3">
+              <p className="mb-1.5 text-xs font-semibold text-gray-700">Search city</p>
               <input
                 type="text"
                 placeholder="Search city"
@@ -353,6 +358,18 @@ const SearchBar = () => {
                 <p className="px-3 py-4 text-sm text-gray-500">No city found</p>
               )}
             </div>
+
+            <button
+              type="button"
+              onClick={handleUseCurrentLocation}
+              className="mt-3 w-full rounded-lg border border-sky-300 bg-sky-50 px-3 py-2.5 text-sm font-semibold text-sky-900 hover:bg-sky-100 transition-colors flex items-center justify-center gap-2"
+            >
+              <LocateFixed className="h-4 w-4" />
+              Use my current location
+            </button>
+            <p className="mt-1.5 text-center text-xs text-gray-500">
+              Allow access to location
+            </p>
           </div>
         </div>
       )}
