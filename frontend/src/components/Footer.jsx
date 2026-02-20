@@ -53,7 +53,7 @@ const Footer = () => {
           <div className="md:col-span-2 grid grid-cols-2 gap-2.5 sm:gap-3.5">
             <div>
               <h3 className="text-white font-semibold text-sm sm:text-base mb-1.5">Quick Links</h3>
-              <ul className="space-y-0.5 sm:space-y-1">
+              <ul className="space-y-0 sm:space-y-1">
                 <li>
                   <Link to="/" className="text-xs sm:text-sm text-gray-300 hover:text-cyan-300 transition-colors duration-200 cursor-pointer">
                     Home

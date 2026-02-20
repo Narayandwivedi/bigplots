@@ -57,7 +57,7 @@ const MobileBottomNav = () => {
               <div className={isSellItem ? 'relative h-4 w-4' : 'relative'}>
                 {isSellItem ? (
                   <span
-                    className={`absolute -top-5 left-1/2 -translate-x-1/2 h-9 w-9 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 text-white border-2 border-white shadow-[0_6px_16px_rgba(14,116,144,0.35)] flex items-center justify-center ${
+                    className={`absolute -top-5 left-1/2 -translate-x-1/2 h-9 w-9 rounded-full bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white border-2 border-white shadow-[0_6px_16px_rgba(5,150,105,0.35)] flex items-center justify-center ${
                       isActive ? 'ring-2 ring-cyan-200' : ''
                     }`}
                   >

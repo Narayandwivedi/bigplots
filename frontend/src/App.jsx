@@ -32,8 +32,10 @@ const AppContent = () => {
   const isLoginPage = location.pathname === '/login'
   const isChatPage = location.pathname === '/chat'
 
+  const showMobileNav = !isLoginPage && !isChatPage
+
   return (
-    <div className="pb-20 md:pb-0">
+    <div className={showMobileNav ? 'pb-14 md:pb-0' : ''}>
       {!isLoginPage && !isChatPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -55,8 +57,8 @@ const AppContent = () => {
         <Route path="/blog/:slug" element={<BlogDetailPage />} />
         <Route path="/product/:id" element={<ProductDetail />} />
       </Routes>
-      {!isLoginPage && !isChatPage && <Footer />}
-      {!isLoginPage && !isChatPage && <MobileBottomNav />}
+      {showMobileNav && <Footer />}
+      {showMobileNav && <MobileBottomNav />}
       <ToastContainer
         position="top-right"
         autoClose={600}
