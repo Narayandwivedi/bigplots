@@ -1,5 +1,6 @@
 import React from 'react'
-import SearchBar from '../../components/SearchBar'
+import LocationStrip from '../../components/LocationStrip'
+import LandSortFilters from '../../components/LandSortFilters'
 import HeroSection from './component/HeroSection'
 import TopDealsSection from './component/TopDealsSection'
 import ShopByCategorySection from './component/ShopByCategorySection'
@@ -7,7 +8,8 @@ import ShopByCategorySection from './component/ShopByCategorySection'
 const Home = () => {
   return (
     <div>
-      <SearchBar />
+      <LocationStrip />
+      <LandSortFilters />
       <HeroSection />
       {/* <TopDealsSection /> */}
       <ShopByCategorySection />

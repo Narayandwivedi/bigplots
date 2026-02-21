@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 
 const SearchResults = () => {
@@ -17,7 +17,7 @@ const SearchResults = () => {
   const [originalSearchInput, setOriginalSearchInput] = useState('')
   const navigate = useNavigate()
 
-  // Comprehensive suggestions based on popular e-commerce search terms - same as SearchBar
+  // Comprehensive suggestions based on popular e-commerce search terms
   const sampleSuggestions = [
     // Graphics Cards
     'Graphics Card',
@@ -179,7 +179,15 @@ const SearchResults = () => {
       if (query) params.append('q', query)
       if (category && category !== 'all') params.append('category', category)
       if (brand && brand !== 'all') params.append('brand', brand)
-      if (sort) params.append('sort', sort)
+      const apiSort =
+        sort === 'total_cost_asc'
+          ? 'price_asc'
+          : sort === 'total_cost_desc'
+            ? 'price_desc'
+            : sort === 'per_acre_asc' || sort === 'per_acre_desc'
+              ? 'relevance'
+              : sort
+      if (apiSort) params.append('sort', apiSort)
       if (page) params.append('page', page.toString())
       params.append('limit', '16')
 
@@ -233,6 +241,160 @@ const SearchResults = () => {
     }).format(price)
   }
 
+  const parseNumericValue = (value) => {
+    if (typeof value === 'number' && Number.isFinite(value)) return value
+    if (typeof value !== 'string') return null
+
+    const cleaned = value.toLowerCase().replace(/,/g, '').trim()
+    const match = cleaned.match(/-?\d+(\.\d+)?/)
+    if (!match) return null
+
+    const numericValue = Number.parseFloat(match[0])
+    if (!Number.isFinite(numericValue)) return null
+
+    if (cleaned.includes('crore') || /\bcr\b/.test(cleaned)) return numericValue * 10000000
+    if (cleaned.includes('lakh') || cleaned.includes('lac')) return numericValue * 100000
+    if (/\bk\b/.test(cleaned)) return numericValue * 1000
+    return numericValue
+  }
+
+  const parseAreaInAcres = (value) => {
+    const numericArea = parseNumericValue(value)
+    if (!Number.isFinite(numericArea) || numericArea <= 0) return null
+
+    if (typeof value === 'string') {
+      const lower = value.toLowerCase()
+      if (
+        lower.includes('sq ft') ||
+        lower.includes('sqft') ||
+        lower.includes('square feet') ||
+        lower.includes('ft2')
+      ) {
+        return numericArea / 43560
+      }
+      if (
+        lower.includes('sq m') ||
+        lower.includes('sqm') ||
+        lower.includes('square meter') ||
+        lower.includes('m2')
+      ) {
+        return numericArea / 4046.8564224
+      }
+      if (lower.includes('hectare') || /\bha\b/.test(lower)) {
+        return numericArea * 2.47105
+      }
+    }
+
+    return numericArea
+  }
+
+  const getLandValuePerAcre = (product) => {
+    const directPerAcreCandidates = [
+      product?.pricePerAcre,
+      product?.perAcrePrice,
+      product?.valuePerAcre,
+      product?.landValuePerAcre,
+    ]
+
+    for (const candidate of directPerAcreCandidates) {
+      const parsed = parseNumericValue(candidate)
+      if (Number.isFinite(parsed) && parsed > 0) {
+        return parsed
+      }
+    }
+
+    const specifications =
+      product?.specifications && typeof product.specifications === 'object'
+        ? Object.entries(product.specifications)
+        : []
+
+    for (const [key, value] of specifications) {
+      const normalizedKey = String(key).toLowerCase()
+      if (
+        /price\s*per\s*acre|value\s*per\s*acre|rate\s*per\s*acre|acre\s*price|acre\s*value/.test(
+          normalizedKey,
+        )
+      ) {
+        const parsed = parseNumericValue(value)
+        if (Number.isFinite(parsed) && parsed > 0) {
+          return parsed
+        }
+      }
+    }
+
+    const totalCost = parseNumericValue(product?.price ?? product?.totalCost ?? product?.totalPrice)
+    if (!Number.isFinite(totalCost) || totalCost <= 0) return null
+
+    const directAreaCandidates = [
+      product?.areaInAcre,
+      product?.acreage,
+      product?.totalAcres,
+      product?.landArea,
+      product?.plotArea,
+      product?.area,
+    ]
+
+    for (const candidate of directAreaCandidates) {
+      const parsedArea = parseAreaInAcres(candidate)
+      if (Number.isFinite(parsedArea) && parsedArea > 0) {
+        return totalCost / parsedArea
+      }
+    }
+
+    for (const [key, value] of specifications) {
+      const normalizedKey = String(key).toLowerCase()
+      if (/acre|land\s*area|plot\s*area|area\s*in\s*acre/.test(normalizedKey)) {
+        const parsedArea = parseAreaInAcres(value)
+        if (Number.isFinite(parsedArea) && parsedArea > 0) {
+          return totalCost / parsedArea
+        }
+      }
+    }
+
+    return null
+  }
+
+  const compareNullableNumbers = (first, second, direction = 'asc') => {
+    const firstIsValid = Number.isFinite(first)
+    const secondIsValid = Number.isFinite(second)
+
+    if (!firstIsValid && !secondIsValid) return 0
+    if (!firstIsValid) return 1
+    if (!secondIsValid) return -1
+
+    return direction === 'asc' ? first - second : second - first
+  }
+
+  const displayedResults = useMemo(() => {
+    const sortedResults = [...searchResults]
+
+    if (sort === 'total_cost_asc' || sort === 'price_asc') {
+      return sortedResults.sort((a, b) =>
+        compareNullableNumbers(parseNumericValue(a?.price), parseNumericValue(b?.price), 'asc'),
+      )
+    }
+
+    if (sort === 'total_cost_desc' || sort === 'price_desc') {
+      return sortedResults.sort((a, b) =>
+        compareNullableNumbers(parseNumericValue(a?.price), parseNumericValue(b?.price), 'desc'),
+      )
+    }
+
+    if (sort === 'per_acre_asc') {
+      return sortedResults.sort((a, b) =>
+        compareNullableNumbers(getLandValuePerAcre(a), getLandValuePerAcre(b), 'asc'),
+      )
+    }
+
+    if (sort === 'per_acre_desc') {
+      return sortedResults.sort((a, b) =>
+        compareNullableNumbers(getLandValuePerAcre(a), getLandValuePerAcre(b), 'desc'),
+      )
+    }
+
+    return sortedResults
+  }, [searchResults, sort])
+
   const handleProductClick = (product) => {
     // Navigate to product detail page using the same logic as other pages
     const categoryPath = product.category === 'laptops' ? 'laptops' : 'pc-parts'
@@ -260,7 +422,7 @@ const SearchResults = () => {
     if (value.length > 0) {
       const valueLower = value.toLowerCase().trim();
       
-      // Smart filtering with priority system - same as SearchBar
+      // Smart filtering with priority system
       const suggestions = sampleSuggestions.map(suggestion => {
         const suggestionLower = suggestion.toLowerCase();
         let score = 0;
@@ -570,8 +732,10 @@ const SearchResults = () => {
                     className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
                   >
                     <option value="relevance">Most Relevant</option>
-                    <option value="price_asc">Price: Low to High</option>
-                    <option value="price_desc">Price: High to Low</option>
+                    <option value="total_cost_desc">Total Cost: Highest to Lowest</option>
+                    <option value="total_cost_asc">Total Cost: Lowest to Highest</option>
+                    <option value="per_acre_desc">Land Value Per Acre: Highest to Lowest</option>
+                    <option value="per_acre_asc">Land Value Per Acre: Lowest to Highest</option>
                     <option value="newest">Newest First</option>
                     <option value="name">Name A-Z</option>
                   </select>
@@ -609,7 +773,7 @@ const SearchResults = () => {
         )}
 
         {/* No Results */}
-        {!loading && !error && searchResults.length === 0 && (
+        {!loading && !error && displayedResults.length === 0 && (
           <div className="text-center py-16">
             <div className="text-gray-400 mb-6">
               <svg className="w-20 h-20 mx-auto" fill="currentColor" viewBox="0 0 20 20">
@@ -638,10 +802,10 @@ const SearchResults = () => {
         )}
 
         {/* Search Results Grid */}
-        {!loading && !error && searchResults.length > 0 && (
+        {!loading && !error && displayedResults.length > 0 && (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {searchResults.map((product) => (
+              {displayedResults.map((product) => (
                 <div 
                   key={product._id} 
                   className="group cursor-pointer transition-all duration-300 bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-cyan-300 hover:shadow-xl hover:shadow-cyan-500/25 transform hover:scale-105"
